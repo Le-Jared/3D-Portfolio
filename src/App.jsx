@@ -6,7 +6,6 @@ import {
   About,
   Contact,
   Experience,
-  Feedbacks,
   Hero,
   Navbar,
   Tech,
@@ -26,7 +25,6 @@ const MainPortfolio = () => {
       <Experience />
       <Tech />
       <Works />
-      <Feedbacks />
       <Contact />
       <Footer />
     </div>

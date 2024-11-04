@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { styles } from "../styles";
-import { TicofabCanvas } from "./canvas";
+import { RocketCanvas } from "./canvas";
 import { Cursor, useTypewriter } from "react-simple-typewriter";
 
 import {
@@ -50,7 +50,7 @@ const Hero = () => {
           </p>
         </div>
       </div>
-      <TicofabCanvas />
+      <RocketCanvas />
 
 
       <div className="absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center">
