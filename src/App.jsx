@@ -12,6 +12,7 @@ import {
   Works,
   StarsCanvas,
   Footer,
+  Feedbacks,
 } from "./components"
 
 const MainPortfolio = () => {
@@ -25,6 +26,7 @@ const MainPortfolio = () => {
       <Experience />
       <Tech />
       <Works />
+      <Feedbacks />
       <Contact />
       <Footer />
     </div>
