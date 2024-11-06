@@ -57,7 +57,6 @@ const WebcamComponent = () => {
     };
   }, []);
 
-  // Effect to restart detection when mode changes
   useEffect(() => {
     if (videoRef.current && videoRef.current.readyState === 4) {
       if (detectionInterval.current) {
@@ -74,7 +73,6 @@ const WebcamComponent = () => {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
@@ -86,7 +84,6 @@ const WebcamComponent = () => {
       faceapi.matchDimensions(canvas, displaySize);
 
       try {
-        // Base detection with landmarks
         const detections = await faceapi
           .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
           .withFaceLandmarks()
@@ -95,14 +92,11 @@ const WebcamComponent = () => {
 
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         
-        // Clear previous drawings
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Always draw face detections
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
-        // Draw additional information based on mode
         resizedDetections.forEach(detection => {
           const box = detection.detection.box;
           const drawBox = new faceapi.draw.DrawBox(box, {
@@ -114,14 +108,12 @@ const WebcamComponent = () => {
           drawBox.draw(canvas);
 
           if (activeMode === "expression") {
-            // Get the most confident expression
             const expressions = detection.expressions;
             const mostLikelyExpression = Object.entries(expressions)
               .reduce((prev, current) => 
                 prev[1] > current[1] ? prev : current
               );
             
-            // Draw expression text
             const drawOptions = {
               fontSize: 20,
               fontStyle: 'Georgia',
