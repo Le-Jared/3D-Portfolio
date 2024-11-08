@@ -72,7 +72,7 @@ const Navbar = () => {
 
         <ul className="list-none hidden sm:flex flex-row items-center gap-10">
           <li>
-            <a href={resume} download="jared_lee.pdf" style={{ textDecoration: 'none' }}>
+            <a href={resume} download="Jared Lee Zhen Yan - Resume.pdf" style={{ textDecoration: 'none' }}>
               <button
                 style={buttonStyle}
                 onClick={() => setActive("Download Resume")}
@@ -118,7 +118,7 @@ const Navbar = () => {
           >
             <ul className='list-none flex justify-end items-start flex-1 flex-col gap-4'>
               <li>
-                <a href={resume} download="jared_lee.pdf" style={{ textDecoration: 'none' }}>
+                <a href={resume} download="Jared Lee Zhen Yan - Resume.pdf" style={{ textDecoration: 'none' }}>
                   <button
                     style={buttonStyle}
                     onClick={() => setActive("Download Resume")}
