@@ -51,9 +51,9 @@ const About = () => {
           consulting, data engineering, and software development. My technical arsenal includes Python, SQL, 
           Java, TypeScript, React, and Node.js, backed by skills in machine learning and Agile methodologies. From
           architecting high-performance APIs to engineering complex financial models, I specialize in creating
-          efficient, user-friendly web applications that bridge technical innovation with business objectives. My
-          experience spans developing e-commerce platforms with cutting-edge tech stacks and managing 
-          projects end-to-end. With a strong educational foundation in Commerce and Software Engineering, 
+          efficient, user-friendly applications that bridge technical innovation with business objectives. My
+          experience spans developing platforms with cutting-edge tech stacks and managing 
+          projects end-to-end. With a strong educational foundation in Accounting & Finance and Software Engineering bootcamp, 
           complemented by certifications in Cybersecurity and Data Science, I'm always ready to tackle new
           challenges. Outside of coding, I'm an avid volunteer, Advanced Open Water Diver, and dance enthusiast.
           Feel free to explore my projects and get in touch at{" "}

@@ -1,4 +1,3 @@
-import logo from "./logo3.png";
 import backend from "./backend.png";
 import creator from "./creator.png";
 import mobile from "./mobile.png";
@@ -25,35 +24,19 @@ import django from "./tech/django.png";
 import postgres from "./tech/postgres.png";
 import sql from "./tech/sql.svg";
 import next from "./tech/next.png";
-import vue from "./tech/vue.svg"
-import carrent from "./carrent.png";
-import jobit from "./jobit.png";
-import tripguide from "./tripguide.png";
-import shop from "./shop.png"
-import youtube from "./youtube.png"
-import jared from "./jared.jpeg"
-import liveLink from "./liveLink.png"
-import portfolio15 from "./portfolio15.png"
-import portfolio16 from "./portfolio16.png"
-import portfolio17 from "./portfolio17.png"
+import vue from "./tech/vue.svg";
+import jared from "./jared.jpeg";
+import liveLink from "./liveLink.png";
 import Logo from "./Logo.png";
-import tiktok from "./tiktok.png";
-import ig from "./ig.png";
-import linktree from "./linktree.png";
-import smartrep from "./smartrep.png";
-import matrixai from "./matrixai.png";
-import beeclone from "./beeclone.png";
-import notable from "./notable.png";
-import zapflow from "./zapflow.png";
 import spring from "./tech/spring.png";
 import bash from "./tech/bash.png";
 import java from "./tech/java.png";
-import consultant from "./consultant.png"
-import data_analyst from "./data-analysis.png"
-import engineer from "./engineer.png"
+import consultant from "./consultant.png";
+import data_analyst from "./data-analysis.png";
+import engineer from "./engineer.png";
+import huddle from "./huddle.png";
 
 export {
-  logo,
   backend,
   creator,
   engineer,
@@ -77,12 +60,7 @@ export {
   tailwind,
   typescript,
   threejs,
-  carrent,
-  jobit,
-  tripguide,
   code1,
-  shop,
-  youtube,
   jared,
   python,
   django,
@@ -91,19 +69,9 @@ export {
   next,
   vue,
   liveLink,
-  portfolio15,
-  portfolio16,
-  portfolio17,
   Logo,
-  tiktok,
-  ig,
-  linktree,
-  smartrep,
-  matrixai,
-  beeclone,
-  notable,
-  zapflow,
   bash,
   java,
   spring,
+  huddle,
 };
