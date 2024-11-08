@@ -15,9 +15,9 @@ import {
   git,
   figma,
   docker,
-  carrent,
-  jobit,
-  tripguide,
+  java,
+  spring,
+  bash,
   threejs,
   code1,
   shop,
@@ -41,7 +41,9 @@ import {
   zapflow,
   notable,
   Logo,
-
+  consultant,
+  data_analyst,
+  engineer,
 
 } from "../assets";
 export const navLinks = [
@@ -61,16 +63,16 @@ export const navLinks = [
 
 const services = [
   {
-    title: "Web Developer",
-    icon: web,
+    title: "Management Consultant",
+    icon: consultant,
   },
   {
-    title: "Frontend Developer",
-    icon: mobile,
+    title: "Data Analyst",
+    icon: data_analyst,
   },
   {
-    title: "Backend Developer",
-    icon: backend,
+    title: "Data Engineer",
+    icon: engineer,
   },
   {
     title: "Fullstack Developer",
@@ -145,49 +147,64 @@ const technologies = [
   },
   {
     name: "java",
-    icon: next,
+    icon: java,
   },
   {
-    name: "vue",
-    icon: vue,
+    name: "spring",
+    icon: spring,
+  },
+  {
+    name: "bash",
+    icon: bash,
   },
 ];
 
 const experiences = [
   {
-    title: "Full-Stack Developer",
-    company_name: "Hack Reactor",
+    title: "Entrepreneurial and Private Business Assistant",
+    company_name: "PwC",
+    icon: code1,
+    iconBg: "#E6DEDD",
+    date: "2020",
+    points: [
+      "Advised clients on digital product strategies, enabling them to leverage emerging technologies for competitive advantage.",
+    ],
+  },
+  {
+    title: "M&A Advisory Associate",
+    company_name: "PwC",
     icon: code1,
     iconBg: "#E6DEDD",
     date: "2021",
     points: [
-      "Successfully led a team of engineers in the development and deployment of a high-performance API web application within a tight six-week timeframe.",
-      "Designed and implemented a scalable backend service utilizing MongoDB and FastAPI, following a test-driven development approach, ensuring a stable and well-tested codebase.",
-      "Implemented secure user authentication by integrating Simple JWT, ensuring secure access to sensitive user information and a seamless user experience.",
+      "Valuations: Engineered complex financial models (DCF, LBO, Market Multiples) for M&A transactions, driving $500M+ in deal value ",
+      "Business Restructuring Services: Executed impactful restructuring initiatives and debt advisory services, significantly enhancing productivity and cost savings",
+      "Operations: Engineered and implemented automation initiatives for a Philippines-based logistics company, boosting operational efficiency by 15%",
     ],
   },
   {
-    title: "Full-Stack Developer",
-    company_name: "ChiqueChickShop",
+    title: "Management Consultant",
+    company_name: "Argile Partners",
     icon: code1,
     iconBg: "#383E56",
-    date: "2022",
+    date: "2023",
     points: [
-      "Developed ChiqueChickShop, a responsive e-commerce platform.",
-      "Enhanced user experience with intuitive navigation features.",
-      "Implemented secure payment processing for online transactions.",
+      "Directed strategic initiatives that achieved a 20% cost reduction and enhanced business performance by leveraging corporate finance modeling and optimizing processes",
+      "Focused on restructuring efforts, implementing innovative solutions to support organizational change management.",
     ],
   },
   {
-    title: "Full-Stack Developer",
-    company_name: "Madamcoon",
+    title: "Software Engineer",
+    company_name: "DBS",
     icon: code1,
     iconBg: "#E6DEDD",
-    date: "2023",
+    date: "2024",
     points: [
-      "Spearheaded the revamp of Madamcoon, focusing on responsive design and user experience improvements.",
-      "Integrated CMS and implemented SEO strategies for enhanced online visibility.",
-      "Optimized the website for increased engagement and performance metrics.",
+      "Architected a high-performance internal API, reducing cross-application data access time by 25% and integrating 10+ complex pipelines organization-wide, improving overall system efficiency",
+      "Engineered automated data mining processes to extract actionable insights from bank-wide data aggregation",
+      "Spearheaded development of a full-stack monitoring solution (Python/Angular) with real-time dashboards that accelerated decision-making and slashed system downtime by 15%, leading to a 30% increase in customer satisfaction scores",
+      "Bridged IT and business units by translating technical specifications and gathering requirements bridging gaps",
+      "Enhanced Quality Assurance through regression testing and Selenium automation with Java Spring Boot",
     ],
   },
 ];

@@ -45,13 +45,21 @@ import matrixai from "./matrixai.png";
 import beeclone from "./beeclone.png";
 import notable from "./notable.png";
 import zapflow from "./zapflow.png";
-
+import spring from "./tech/spring.png";
+import bash from "./tech/bash.png";
+import java from "./tech/java.png";
+import consultant from "./consultant.png"
+import data_analyst from "./data-analysis.png"
+import engineer from "./engineer.png"
 
 export {
   logo,
   backend,
   creator,
+  engineer,
   mobile,
+  consultant,
+  data_analyst,
   web,
   github,
   menu,
@@ -95,4 +103,7 @@ export {
   beeclone,
   notable,
   zapflow,
+  bash,
+  java,
+  spring,
 };
