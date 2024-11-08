@@ -100,10 +100,6 @@ const technologies = [
     icon: reactjs,
   },
   {
-    name: "Redux Toolkit",
-    icon: redux,
-  },
-  {
     name: "Tailwind CSS",
     icon: tailwind,
   },
@@ -148,7 +144,7 @@ const technologies = [
     icon: threejs,
   },
   {
-    name: "next",
+    name: "java",
     icon: next,
   },
   {
@@ -269,7 +265,6 @@ const projects = [
     ],
     image: smartrep,
     source_code_link: "https://github.com/jeffjiang13/smartrep-ai",
-    liveUrl: "https://jj-smartrep.vercel.app/",
   },
   {
     name: "Notable",
@@ -291,7 +286,6 @@ const projects = [
     ],
     image: notable,
     source_code_link: "https://github.com/jeffjiang13/notable",
-    liveUrl: "https://jj-notable.up.railway.app/",
   },
   {
     name: "ZapFlow",
@@ -313,7 +307,6 @@ const projects = [
     ],
     image: zapflow,
     source_code_link: "https://github.com/jeffjiang13/saas-automation",
-    liveUrl: "https://jj-zapflow.vercel.app/",
   },
   {
     name: "Beeclone",
@@ -335,7 +328,6 @@ const projects = [
     ],
     image: beeclone,
     source_code_link: "https://github.com/jeffjiang13/saas-newsletter",
-    liveUrl: "https://jj-newsletter.vercel.app/",
   },
   {
     name: "Matrix AI",
@@ -357,7 +349,6 @@ const projects = [
     ],
     image: matrixai,
     source_code_link: "https://github.com/jeffjiang13/MatrixAI",
-    liveUrl: "https://jj-matrix-ai.vercel.app/",
   },
   {
     name: "LinkTri",
@@ -379,7 +370,6 @@ const projects = [
     ],
     image: linktree,
     source_code_link: "https://github.com/jeffjiang13/LinkTree",
-    liveUrl: "https://jj-linktri.vercel.app/",
   },
   {
     name: "Instagram Clone,",
@@ -401,7 +391,6 @@ const projects = [
     ],
     image: ig,
     source_code_link: "https://github.com/jeffjiang13/IG-2.0",
-    liveUrl: "https://jj-ig.vercel.app/",
   },
   {
     name: "TikTok Clone",
@@ -423,7 +412,6 @@ const projects = [
     ],
     image: tiktok,
     source_code_link: "https://github.com/jeffjiang13/tiktok",
-    liveUrl: "https://jj-tiktok.vercel.app/",
   },
   {
     name: "TailorTech",
@@ -445,7 +433,6 @@ const projects = [
     ],
     image: portfolio17,
     source_code_link: "https://github.com/jeffjiang13/tailortech",
-    liveUrl: "https://jj-tailortech.vercel.app/",
   },
   {
     name: "ChiqueChickShop",
@@ -467,7 +454,6 @@ const projects = [
     ],
     image: portfolio16,
     source_code_link: "https://github.com/jeffjiang13",
-    liveUrl: "https://chiquechickshop.com/",
   },
   {
     name: "Madamcoon Maine Coon Cattery NYC",
@@ -489,7 +475,6 @@ const projects = [
     ],
     image: portfolio15,
     source_code_link: "https://github.com/jeffjiang13",
-    liveUrl: "https://madamcoon.com/",
   },
   {
     name: "Movie App",
@@ -511,7 +496,6 @@ const projects = [
     ],
     image: Logo,
     source_code_link: "https://github.com/jeffjiang13/movie-app",
-    liveUrl: "https://jj-movie-app.netlify.app/",
   },
   {
     name: "Ecommerce App",
@@ -533,7 +517,6 @@ const projects = [
     ],
     image: shop,
     source_code_link: "https://github.com/jeffjiang13/ecommerce_sanity",
-    liveUrl: "https://jj-ecomstore.vercel.app/",
   },
   {
     name: "YouTube Clone",
@@ -555,7 +538,6 @@ const projects = [
     ],
     image: youtube,
     source_code_link: "https://github.com/jeffjiang13/youtube-clone",
-    liveUrl: "https://jj-youtube-clone.netlify.app/",
   },
 ];
 

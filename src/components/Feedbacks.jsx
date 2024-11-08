@@ -81,7 +81,6 @@ const WebcamComponent = () => {
 
     if (!video || !boxCanvas || !textCanvas) return;
 
-    // Set canvas dimensions to match video
     boxCanvas.width = video.videoWidth;
     boxCanvas.height = video.videoHeight;
     textCanvas.width = video.videoWidth;
@@ -100,11 +99,17 @@ const WebcamComponent = () => {
     // Detect faces and draw boxes (less frequent)
     detectionInterval.current = setInterval(async () => {
       try {
-        detections = await faceapi
-          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-          .withFaceLandmarks()
-          .withFaceExpressions()
-          .withAgeAndGender();
+        if (activeMode === "age-gender") {
+          detections = await faceapi
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withAgeAndGender();
+        } else {
+          detections = await faceapi
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceExpressions();
+        }
 
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         
@@ -122,15 +127,24 @@ const WebcamComponent = () => {
       textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
 
       detections.forEach(detection => {
-        const { age, gender, expressions, detection: { box } } = detection;
-        const label = activeMode === "age-gender"
-          ? `Age: ${Math.round(age)} Gender: ${gender}`
-          : `Expression: ${Object.entries(expressions).reduce((a, b) => (a[1] > b[1] ? a : b))[0]}`;
+        const { detection: { box } } = detection;
+        let label;
+
+        if (activeMode === "age-gender") {
+          const { age, gender } = detection;
+          label = `Age: ${Math.round(age)} Gender: ${gender}`;
+        } else {
+          const { expressions } = detection;
+          const mostLikelyExpression = Object.entries(expressions)
+            .reduce((prev, current) => prev[1] > current[1] ? prev : current);
+          label = `Expression: ${mostLikelyExpression[0]}`;
+        }
 
         const drawBox = new faceapi.draw.DrawBox(box, { label });
         drawBox.draw(textCanvas);
 
         if (activeMode === "expression") {
+          const { expressions } = detection;
           const mostLikelyExpression = Object.entries(expressions)
             .reduce((prev, current) => prev[1] > current[1] ? prev : current);
           
