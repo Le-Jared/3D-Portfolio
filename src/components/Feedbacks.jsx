@@ -8,11 +8,13 @@ import { Camera } from 'lucide-react';
 
 const WebcamComponent = () => {
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const boxCanvasRef = useRef(null);
+  const textCanvasRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeMode, setActiveMode] = useState("age-gender");
   const detectionInterval = useRef(null);
+  const textUpdateInterval = useRef(null);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -54,40 +56,51 @@ const WebcamComponent = () => {
       if (detectionInterval.current) {
         clearInterval(detectionInterval.current);
       }
+      if (textUpdateInterval.current) {
+        clearInterval(textUpdateInterval.current);
+      }
     };
   }, []);
 
-  // Effect to restart detection when mode changes
   useEffect(() => {
     if (videoRef.current && videoRef.current.readyState === 4) {
       if (detectionInterval.current) {
         clearInterval(detectionInterval.current);
+      }
+      if (textUpdateInterval.current) {
+        clearInterval(textUpdateInterval.current);
       }
       startDetection();
     }
   }, [activeMode]);
 
   const startDetection = () => {
+    const video = videoRef.current;
+    const boxCanvas = boxCanvasRef.current;
+    const textCanvas = textCanvasRef.current;
+
+    if (!video || !boxCanvas || !textCanvas) return;
+
+    // Set canvas dimensions to match video
+    boxCanvas.width = video.videoWidth;
+    boxCanvas.height = video.videoHeight;
+    textCanvas.width = video.videoWidth;
+    textCanvas.height = video.videoHeight;
+
+    const displaySize = {
+      width: video.videoWidth,
+      height: video.videoHeight
+    };
+
+    faceapi.matchDimensions(boxCanvas, displaySize);
+    faceapi.matchDimensions(textCanvas, displaySize);
+
+    let detections = [];
+
+    // Detect faces and draw boxes (less frequent)
     detectionInterval.current = setInterval(async () => {
-      if (!videoRef.current || !canvasRef.current) return;
-
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      const displaySize = {
-        width: video.videoWidth,
-        height: video.videoHeight
-      };
-
-      faceapi.matchDimensions(canvas, displaySize);
-
       try {
-        // Base detection with landmarks
-        const detections = await faceapi
+        detections = await faceapi
           .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
           .withFaceLandmarks()
           .withFaceExpressions()
@@ -95,53 +108,49 @@ const WebcamComponent = () => {
 
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         
-        // Clear previous drawings
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Always draw face detections
-        faceapi.draw.drawDetections(canvas, resizedDetections);
-
-        // Draw additional information based on mode
-        resizedDetections.forEach(detection => {
-          const box = detection.detection.box;
-          const drawBox = new faceapi.draw.DrawBox(box, {
-            label: activeMode === "age-gender"
-              ? `Age: ${Math.round(detection.age)} Gender: ${detection.gender}`
-              : `Expression: ${Object.entries(detection.expressions)
-                  .reduce((a, b) => (a[1] > b[1] ? a : b))[0]}`
-          });
-          drawBox.draw(canvas);
-
-          if (activeMode === "expression") {
-            // Get the most confident expression
-            const expressions = detection.expressions;
-            const mostLikelyExpression = Object.entries(expressions)
-              .reduce((prev, current) => 
-                prev[1] > current[1] ? prev : current
-              );
-            
-            // Draw expression text
-            const drawOptions = {
-              fontSize: 20,
-              fontStyle: 'Georgia',
-              fontColor: 'white',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              padding: 10
-            };
-
-            const drawTextField = new faceapi.draw.DrawTextField(
-              [`${mostLikelyExpression[0]}: ${(mostLikelyExpression[1] * 100).toFixed(1)}%`],
-              { x: box.x, y: box.bottom + 3 },
-              drawOptions
-            );
-            drawTextField.draw(canvas);
-          }
-        });
+        const boxCtx = boxCanvas.getContext('2d');
+        boxCtx.clearRect(0, 0, boxCanvas.width, boxCanvas.height);
+        faceapi.draw.drawDetections(boxCanvas, resizedDetections);
       } catch (err) {
         console.error('Detection error:', err);
       }
-    }, 100);
+    }, 500); // Reduced frequency for face detection
+
+    // Update text information (more frequent)
+    textUpdateInterval.current = setInterval(() => {
+      const textCtx = textCanvas.getContext('2d');
+      textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+
+      detections.forEach(detection => {
+        const { age, gender, expressions, detection: { box } } = detection;
+        const label = activeMode === "age-gender"
+          ? `Age: ${Math.round(age)} Gender: ${gender}`
+          : `Expression: ${Object.entries(expressions).reduce((a, b) => (a[1] > b[1] ? a : b))[0]}`;
+
+        const drawBox = new faceapi.draw.DrawBox(box, { label });
+        drawBox.draw(textCanvas);
+
+        if (activeMode === "expression") {
+          const mostLikelyExpression = Object.entries(expressions)
+            .reduce((prev, current) => prev[1] > current[1] ? prev : current);
+          
+          const drawOptions = {
+            fontSize: 20,
+            fontStyle: 'Georgia',
+            fontColor: 'white',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            padding: 10
+          };
+
+          const drawTextField = new faceapi.draw.DrawTextField(
+            [`${mostLikelyExpression[0]}: ${(mostLikelyExpression[1] * 100).toFixed(1)}%`],
+            { x: box.x, y: box.bottom + 3 },
+            drawOptions
+          );
+          drawTextField.draw(textCanvas);
+        }
+      });
+    }, 100); // Higher frequency for text updates
   };
 
   const handleVideoPlay = () => {
@@ -212,7 +221,17 @@ const WebcamComponent = () => {
             className="rounded-lg"
           />
           <canvas
-            ref={canvasRef}
+            ref={boxCanvasRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%'
+            }}
+          />
+          <canvas
+            ref={textCanvasRef}
             style={{
               position: 'absolute',
               top: 0,
@@ -227,7 +246,7 @@ const WebcamComponent = () => {
           <p className="text-secondary text-[14px]">
             <Camera className="inline mr-2" />
             {activeMode === "age-gender" 
-              ? "Point your camera at faces to detect age and gender"
+              ? "Point your camera at faces to estimate age and gender"
               : "Point your camera at faces to detect expressions"}
           </p>
         </div>

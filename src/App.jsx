@@ -58,7 +58,7 @@ function App() {
         </BrowserRouter>
       ) : (
         <div className="relative z-10 w-full h-full">
-          <Spline scene="https://prod.spline.design/ry25-HB1ochqLK-4/scene.splinecode" />
+          <Spline scene="https://prod.spline.design/zKJv1tmmbRwLedOs/scene.splinecode" />
           {showWelcomeButton && (
             <button
               onClick={() => setStartPortfolio(true)}
