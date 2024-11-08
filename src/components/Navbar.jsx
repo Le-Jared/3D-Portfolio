@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { styles } from "../styles";
 import { navLinks } from "../constants";
 import { menu, close } from "../assets";
-import resume from "/src/jared_lee.pdf";
+import resume from "/src/Jared Lee Zhen Yan - Resume.pdf";
 import { Logo } from "../assets"; 
 
 const Navbar = () => {
