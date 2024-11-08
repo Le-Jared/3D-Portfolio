@@ -40,6 +40,7 @@ import BarbieBank from "./BarbieBank.png";
 import PropertyLah from "./PropertyLah.png";
 import BetterLife from "./BetterLife.png";
 import BudgetLah from "./BudgetLah.png";
+import Streamhub from "./Streamhub.png";
 
 export {
   backend,
@@ -84,4 +85,5 @@ export {
   huddle,
   crypto,
   BarbieBank,
+  Streamhub,
 };

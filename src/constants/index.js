@@ -28,7 +28,8 @@ import {
   PropertyLah,
   BudgetLah,
   BetterLife,
-  BarbieBank
+  BarbieBank,
+  Streamhub,
 
 } from "../assets";
 export const navLinks = [
@@ -196,40 +197,6 @@ const experiences = [
 
 const projects = [
   {
-    name: "Huddle",
-    description:
-      "A simple Web-based Client Relationship Management application that uses back-end and front-end technologies.",
-    tags: [
-      {
-        name: "Node.js",
-        color: "blue-text-gradient",
-      },
-      {
-        name: "Ejs",
-        color: "green-text-gradient",
-      },
-      {
-        name: "MongoDB",
-        color: "pink-text-gradient",
-      },
-    ],
-    image: huddle,
-    source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
-  },
-  {
-    name: "Personal Chain Coin",
-    description:
-      "Educational blockchain project that implements a custom ERC20 token and advanced asset management system, serving as a hands-on exploration of DeFi concepts, smart contract development, and cryptocurrency mechanics for personal learning.",
-    tags: [
-      {
-        name: "Solidity",
-        color: "grey-text-gradient",
-      },
-    ],
-    image: crypto,
-    source_code_link: "https://github.com/Le-Jared/Personal-Chain-Coin",
-  },
-  {
     name: "Streamhub",
     description:
       "StreamHub is a communication platform that uses Kafka for real-time messaging, offering secure access like Teleport, live chat with emoji reactions, and speech-to-text functionality for distributed team collaboration.",
@@ -247,7 +214,7 @@ const projects = [
         color: "blue-text-gradient",
       },
     ],
-    image: huddle,
+    image: Streamhub,
     source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
   },
   {
@@ -333,6 +300,40 @@ const projects = [
     ],
     image: BetterLife,
     source_code_link: "https://github.com/Le-Jared/Better_Life",
+  },
+  {
+    name: "Personal Chain Coin",
+    description:
+      "Educational blockchain project that implements a custom ERC20 token and advanced asset management system, serving as a hands-on exploration of DeFi concepts, smart contract development, and cryptocurrency mechanics for personal learning.",
+    tags: [
+      {
+        name: "Solidity",
+        color: "grey-text-gradient",
+      },
+    ],
+    image: crypto,
+    source_code_link: "https://github.com/Le-Jared/Personal-Chain-Coin",
+  },
+  {
+    name: "Huddle",
+    description:
+      "A simple Web-based Client Relationship Management application that uses back-end and front-end technologies.",
+    tags: [
+      {
+        name: "Node.js",
+        color: "blue-text-gradient",
+      },
+      {
+        name: "Ejs",
+        color: "green-text-gradient",
+      },
+      {
+        name: "MongoDB",
+        color: "pink-text-gradient",
+      },
+    ],
+    image: huddle,
+    source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
   },
 ];
 
