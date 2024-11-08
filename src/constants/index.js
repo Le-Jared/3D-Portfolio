@@ -1,14 +1,10 @@
 import {
-  mobile,
-  backend,
   creator,
-  web,
   javascript,
   typescript,
   html,
   css,
   reactjs,
-  redux,
   tailwind,
   nodejs,
   mongodb,
@@ -24,14 +20,15 @@ import {
   django,
   postgres,
   sql,
-  next,
-  vue,
-  liveLink,
-  Logo,
   consultant,
   data_analyst,
   engineer,
   huddle,
+  crypto,
+  PropertyLah,
+  BudgetLah,
+  BetterLife,
+  BarbieBank
 
 } from "../assets";
 export const navLinks = [
@@ -219,7 +216,124 @@ const projects = [
     image: huddle,
     source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
   },
-
+  {
+    name: "Personal Chain Coin",
+    description:
+      "Educational blockchain project that implements a custom ERC20 token and advanced asset management system, serving as a hands-on exploration of DeFi concepts, smart contract development, and cryptocurrency mechanics for personal learning.",
+    tags: [
+      {
+        name: "Solidity",
+        color: "grey-text-gradient",
+      },
+    ],
+    image: crypto,
+    source_code_link: "https://github.com/Le-Jared/Personal-Chain-Coin",
+  },
+  {
+    name: "Streamhub",
+    description:
+      "StreamHub is a communication platform that uses Kafka for real-time messaging, offering secure access like Teleport, live chat with emoji reactions, and speech-to-text functionality for distributed team collaboration.",
+    tags: [
+      {
+        name: "React",
+        color: "pink-text-gradient",
+      },
+      {
+        name: "SpringBoot",
+        color: "green-text-gradient",
+      },
+      {
+        name: "PostgreSQL",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: huddle,
+    source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
+  },
+  {
+    name: "Banking Application",
+    description:
+      "A banking solution, featuring dashboard, deposit, credit card and currency rates and conversion along with latest news and stock information",
+    tags: [
+      {
+        name: "Java",
+        color: "red-text-gradient",
+      },
+      {
+        name: "Thymeleaf",
+        color: "green-text-gradient",
+      },
+      {
+        name: "MySQL",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: BarbieBank,
+    source_code_link: "https://github.com/Le-Jared/Online-Banking-Application",
+  },
+  {
+    name: "PropertyLah",
+    description:
+      "PropertyLah is a web application for managing properties. This application allows users to manage their properties and tenants, view properties on a map, and change their account details.",
+    tags: [
+      {
+        name: "Bootstrap",
+        color: "pink-text-gradient",
+      },
+      {
+        name: "Thymeleaf",
+        color: "green-text-gradient",
+      },
+      {
+        name: "MySQL",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: PropertyLah,
+    source_code_link: "https://github.com/Le-Jared/PropertyLah",
+  },
+  {
+    name: "BudgetLah",
+    description:
+      "Budget Lah is a web-based application built with the Flask framework and Jinja2 templating engine, using PostgreSQL as its database. It is designed to help individuals and households track their expenses, create and manage budgets, and generate reports for better financial planning",
+    tags: [
+      {
+        name: "Javascript",
+        color: "green-text-gradient",
+      },
+      {
+        name: "Python",
+        color: "dark-blue-text-gradient",
+      },
+      {
+        name: "PostgresSQL",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: BudgetLah,
+    source_code_link: "https://github.com/Le-Jared/Budget-Lah",
+  },
+  {
+    name: "BetterLife",
+    description:
+      "BetterLife stores medicine information and stock inventory management as a Pharmacist, whilst providing a map interface for Consumers to identify the stores closest to them. ",
+    tags: [
+      {
+        name: "React",
+        color: "pink-text-gradient",
+      },
+      {
+        name: "Python",
+        color: "dark-blue-text-gradient",
+      },
+      {
+        name: "MongoDB",
+        color: "green-text-gradient",
+      },
+    ],
+    image: BetterLife,
+    source_code_link: "https://github.com/Le-Jared/Better_Life",
+  },
 ];
 
 export {

@@ -35,9 +35,17 @@ import consultant from "./consultant.png";
 import data_analyst from "./data-analysis.png";
 import engineer from "./engineer.png";
 import huddle from "./huddle.png";
+import crypto from "./cryptocurrency.png";
+import BarbieBank from "./BarbieBank.png";
+import PropertyLah from "./PropertyLah.png";
+import BetterLife from "./BetterLife.png";
+import BudgetLah from "./BudgetLah.png";
 
 export {
   backend,
+  BetterLife,
+  BudgetLah,
+  PropertyLah,
   creator,
   engineer,
   mobile,
@@ -74,4 +82,6 @@ export {
   java,
   spring,
   huddle,
+  crypto,
+  BarbieBank,
 };
