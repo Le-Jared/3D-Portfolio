@@ -96,7 +96,6 @@ const WebcamComponent = () => {
 
     let detections = [];
 
-    // Detect faces and draw boxes (less frequent)
     detectionInterval.current = setInterval(async () => {
       try {
         if (activeMode === "age-gender") {
@@ -119,52 +118,53 @@ const WebcamComponent = () => {
       } catch (err) {
         console.error('Detection error:', err);
       }
-    }, 500); // Reduced frequency for face detection
+    }, 500); 
 
-    // Update text information (more frequent)
     textUpdateInterval.current = setInterval(() => {
       const textCtx = textCanvas.getContext('2d');
       textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-
-      detections.forEach(detection => {
+    
+      detections.forEach((detection, index) => {
         const { detection: { box } } = detection;
         let label;
-
+    
         if (activeMode === "age-gender") {
           const { age, gender } = detection;
-          label = `Age: ${Math.round(age)} Gender: ${gender}`;
+          label = `Age: ${Math.round(age)} | Gender: ${gender}`;
         } else {
           const { expressions } = detection;
           const mostLikelyExpression = Object.entries(expressions)
             .reduce((prev, current) => prev[1] > current[1] ? prev : current);
-          label = `Expression: ${mostLikelyExpression[0]}`;
+          label = `Expression: ${mostLikelyExpression[0]} (${(mostLikelyExpression[1] * 100).toFixed(1)}%)`;
         }
 
-        const drawBox = new faceapi.draw.DrawBox(box, { label });
+        const drawBox = new faceapi.draw.DrawBox(box, { 
+          boxColor: '#4287f5',
+          drawLabelOptions: {
+            drawLabel: false 
+          }
+        });
         drawBox.draw(textCanvas);
 
-        if (activeMode === "expression") {
-          const { expressions } = detection;
-          const mostLikelyExpression = Object.entries(expressions)
-            .reduce((prev, current) => prev[1] > current[1] ? prev : current);
-          
-          const drawOptions = {
-            fontSize: 20,
-            fontStyle: 'Georgia',
-            fontColor: 'white',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            padding: 10
-          };
+        const padding = 20;
+        const lineHeight = 30;
+        const yPosition = textCanvas.height - padding - (detections.length - 1 - index) * lineHeight;
 
-          const drawTextField = new faceapi.draw.DrawTextField(
-            [`${mostLikelyExpression[0]}: ${(mostLikelyExpression[1] * 100).toFixed(1)}%`],
-            { x: box.x, y: box.bottom + 3 },
-            drawOptions
-          );
-          drawTextField.draw(textCanvas);
-        }
+        textCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        textCtx.roundRect(
+          padding, 
+          yPosition - 20, 
+          textCtx.measureText(label).width + 20, 
+          30, 
+          5
+        );
+        textCtx.fill();
+
+        textCtx.font = '16px Inter';
+        textCtx.fillStyle = '#ffffff';
+        textCtx.fillText(label, padding + 10, yPosition);
       });
-    }, 100); // Higher frequency for text updates
+    }, 100);
   };
 
   const handleVideoPlay = () => {
