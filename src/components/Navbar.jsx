@@ -66,7 +66,7 @@ const Navbar = () => {
         >
           <img src={Logo} alt='logo' className='w-24 h-24 object-contain' />
           <p className='text-white text-[18px] font-bold cursor-pointer flex'>
-            FullStack Developer &nbsp;
+            Agile Learner &nbsp;
           </p>
         </Link>
 
