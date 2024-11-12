@@ -30,6 +30,8 @@ import {
   BetterLife,
   BarbieBank,
   Streamhub,
+  Deal,
+  Exec,
 
 } from "../assets";
 export const navLinks = [
@@ -147,9 +149,9 @@ const technologies = [
 
 const experiences = [
   {
-    title: "Entrepreneurial and Private Business Assistant",
+    title: "Entrepreneurial and Private Business Executive",
     company_name: "PwC",
-    icon: code1,
+    icon: Exec,
     iconBg: "#E6DEDD",
     date: "2020",
     points: [
@@ -159,7 +161,7 @@ const experiences = [
   {
     title: "M&A Advisory Associate",
     company_name: "PwC",
-    icon: code1,
+    icon: Deal,
     iconBg: "#E6DEDD",
     date: "2021",
     points: [
@@ -171,12 +173,12 @@ const experiences = [
   {
     title: "Management Consultant",
     company_name: "Argile Partners",
-    icon: code1,
-    iconBg: "#383E56",
+    icon: consultant,
+    iconBg: "#E6DEDD",
     date: "2023",
     points: [
-      "Directed strategic initiatives that achieved a 20% cost reduction and enhanced business performance by leveraging corporate finance modeling and optimizing processes",
-      "Focused on restructuring efforts, implementing innovative solutions to support organizational change management.",
+      "Developed sophisticated financial models and valuation analyses, identifying cost optimization strategies that reduced operational expenses by 20% and significantly enhanced business performance for target companies",
+      "Led vital restructuring analyses and cash flow optimization strategies that extended startup runway during challenging markets",
     ],
   },
   {
@@ -186,7 +188,9 @@ const experiences = [
     iconBg: "#E6DEDD",
     date: "2024",
     points: [
-      "Architected a high-performance internal API, reducing cross-application data access time by 25% and integrating 10+ complex pipelines organization-wide, improving overall system efficiency",
+      "Trained and developed Machine Learning Models for enhancing banking operations and customer experience",
+      "Fine-tuned and deployed an AI-powered text-to-SQL model, enhancing database accessibility for non-technical users",
+      "Architected internal APIs, reducing cross-application data access time and integrating organization-wide data pipelines",
       "Engineered automated data mining processes to extract actionable insights from bank-wide data aggregation",
       "Spearheaded development of a full-stack monitoring solution (Python/Angular) with real-time dashboards that accelerated decision-making and slashed system downtime by 15%, leading to a 30% increase in customer satisfaction scores",
       "Bridged IT and business units by translating technical specifications and gathering requirements bridging gaps",

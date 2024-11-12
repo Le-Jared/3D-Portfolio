@@ -41,9 +41,13 @@ import PropertyLah from "./PropertyLah.png";
 import BetterLife from "./BetterLife.png";
 import BudgetLah from "./BudgetLah.png";
 import Streamhub from "./Streamhub.png";
+import Deal from "./deal.png";
+import Exec from "./exec.png";
 
 export {
+  Exec,
   backend,
+  Deal,
   BetterLife,
   BudgetLah,
   PropertyLah,
