@@ -55,7 +55,7 @@ const services = [
     icon: consultant,
   },
   {
-    title: "Data Analyst",
+    title: "Business Analyst",
     icon: data_analyst,
   },
   {
