@@ -15,6 +15,7 @@ const WebcamComponent = () => {
   const [activeMode, setActiveMode] = useState("age-gender");
   const detectionInterval = useRef(null);
   const textUpdateInterval = useRef(null);
+  const [showPermissionDialog, setShowPermissionDialog] = useState(true);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -27,6 +28,10 @@ const WebcamComponent = () => {
           faceapi.nets.faceExpressionNet.loadFromUri('/models'),
           faceapi.nets.ageGenderNet.loadFromUri('/models')
         ]);
+        
+        if (showPermissionDialog) {
+          return;
+        }
         
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { 
@@ -60,7 +65,7 @@ const WebcamComponent = () => {
         clearInterval(textUpdateInterval.current);
       }
     };
-  }, []);
+  }, [showPermissionDialog]);
 
   useEffect(() => {
     if (videoRef.current && videoRef.current.readyState === 4) {
@@ -171,11 +176,73 @@ const WebcamComponent = () => {
     startDetection();
   };
 
+  const handleAcceptPermission = async () => {
+    setShowPermissionDialog(false);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: 'user'
+        } 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      
+      setIsLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <motion.div
       variants={fadeIn("up", "spring", 0.5, 0.75)}
       className="bg-black-200 p-5 rounded-3xl w-full"
     >
+    {showPermissionDialog && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-tertiary p-6 rounded-xl max-w-md m-4">
+          <h3 className="text-xl font-bold mb-4 text-white">Camera Permission Required</h3>
+          <div className="space-y-4">
+            <p className="text-white">
+              This face analysis demo needs camera access to:
+            </p>
+            <ul className="list-disc list-inside text-white space-y-2 ml-4">
+              <li>Detect faces in real-time</li>
+              <li>Analyze age and gender characteristics</li>
+              <li>Recognize facial expressions</li>
+            </ul>
+            {/* Updated privacy notice section */}
+            <div className="bg-white/10 p-4 rounded-lg border border-white/20">
+              <p className="text-sm text-white">
+                <strong className="text-violet-400 font-bold">Privacy Notice:</strong>{' '}
+                All processing is done locally in your browser. 
+                No video data is stored or transmitted to any server.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-4 mt-6">
+              <button 
+                className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
+                onClick={() => setError("Camera permission denied by user")}
+              >
+                Cancel
+              </button>
+              <button 
+                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                onClick={handleAcceptPermission}
+              >
+                Allow Camera Access
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
