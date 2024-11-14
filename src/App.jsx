@@ -34,13 +34,15 @@ const MainPortfolio = () => {
 }
 
 function App() {
-  const [startPortfolio, setStartPortfolio] = useState(false)
+  // Set this to true to show main portfolio immediately
+  const [startPortfolio, setStartPortfolio] = useState(true)
   const [showWelcomeButton, setShowWelcomeButton] = useState(false)
+  const [showSpline, setShowSpline] = useState(false)  
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowWelcomeButton(true)
-    }, 4000) // 1000 milliseconds = 1 seconds
+    }, 4000)
 
     return () => clearTimeout(timer) 
   }, [])
@@ -58,7 +60,9 @@ function App() {
         </BrowserRouter>
       ) : (
         <div className="relative z-10 w-full h-full">
-          <Spline scene="https://prod.spline.design/zKJv1tmmbRwLedOs/scene.splinecode" />
+          {showSpline && (  
+            <Spline scene="https://prod.spline.design/zKJv1tmmbRwLedOs/scene.splinecode" />
+          )}
           {showWelcomeButton && (
             <button
               onClick={() => setStartPortfolio(true)}

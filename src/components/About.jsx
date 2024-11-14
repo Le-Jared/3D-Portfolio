@@ -47,13 +47,13 @@ const About = () => {
           variants={fadeIn("", "", 0.1, 1)}
           className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
         >
-          Hello! I'm Jared Lee, a Singapore-based Full-Stack Developer with a unique blend of expertise in finance, 
+          Hello! I'm Jared Lee, a Singaporean with a unique blend of expertise in finance, 
           consulting, data engineering, and software development. My technical arsenal includes Python, SQL, 
-          Java, TypeScript, React, and Node.js, backed by skills in machine learning and Agile methodologies. From
-          architecting high-performance APIs to engineering complex financial models, I specialize in creating
+          Java, TypeScript and Unix, backed by skills in machine learning and Agile methodologies. From
+          architecting machine learning models to engineering complex financial models, I specialize in creating
           efficient, user-friendly applications that bridge technical innovation with business objectives. My
-          experience spans developing platforms with cutting-edge tech stacks and managing 
-          projects end-to-end. With a strong educational foundation in Accounting & Finance and Software Engineering bootcamp, 
+          experience spans developing platforms with cutting-edge tech stacks and managing projects end-to-end.
+          With a strong educational foundation in Accounting & Finance and attending a Software Engineering bootcamp, 
           complemented by certifications in Cybersecurity and Data Science, I'm always ready to tackle new
           challenges. Outside of coding, I'm an avid volunteer, Advanced Open Water Diver, and dance enthusiast.
           Feel free to explore my projects and get in touch at{" "}
