@@ -32,6 +32,7 @@ import {
   Streamhub,
   Deal,
   Exec,
+  EventHub,
 
 } from "../assets";
 export const navLinks = [
@@ -240,6 +241,27 @@ const projects = [
     ],
     image: BarbieBank,
     source_code_link: "https://github.com/Le-Jared/Online-Banking-Application",
+  },
+  {
+    name: "EventHub",
+    description:
+      "Event Manager that allows you to manage online events such as sharing 3D models, with text to speech chatbot",
+    tags: [
+      {
+        name: "React",
+        color: "pink-text-gradient",
+      },
+      {
+        name: "SpringBoot",
+        color: "green-text-gradient",
+      },
+      {
+        name: "PostgreSQL",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: EventHub,
+    source_code_link: "https://github.com/Le-Jared/event-hub-frontend",
   },
   {
     name: "PropertyLah",

@@ -43,8 +43,10 @@ import BudgetLah from "./BudgetLah.png";
 import Streamhub from "./Streamhub.png";
 import Deal from "./deal.png";
 import Exec from "./exec.png";
+import EventHub from "./EventManagement.png";
 
 export {
+  EventHub,
   Exec,
   backend,
   Deal,
