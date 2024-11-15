@@ -9,6 +9,7 @@ import {
   BsGithub,
   BsDiscord,
   BsLinkedin,
+  BsMedium,
 } from "react-icons/bs";
 
 const Hero = () => {
@@ -84,8 +85,8 @@ const Hero = () => {
           />
         </Link>
 
-        <Link target="_blank" to="https://discord.com/channels/@lazy1995">
-          <BsDiscord
+        <Link target="_blank" to="https://medium.com/@jared.lee.zhen.yan">
+          <BsMedium
             size={30}
             className="icon hover:text-[#5865F2] hover:translate-y-[-2px] hover:cursor-pointer transition-all ease-in duration-100"
           />
