@@ -160,7 +160,7 @@ const experiences = [
     ],
   },
   {
-    title: "M&A Advisory Associate",
+    title: "Deals Advisory Associate",
     company_name: "PwC",
     icon: Deal,
     iconBg: "#E6DEDD",
