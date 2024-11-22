@@ -33,6 +33,7 @@ import {
   Deal,
   Exec,
   EventHub,
+  csharp,
 
 } from "../assets";
 export const navLinks = [
@@ -145,6 +146,10 @@ const technologies = [
   {
     name: "bash",
     icon: bash,
+  },
+  {
+    name: "csharp",
+    icon: csharp,
   },
 ];
 

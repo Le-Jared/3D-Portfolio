@@ -44,6 +44,7 @@ import Streamhub from "./Streamhub.png";
 import Deal from "./deal.png";
 import Exec from "./exec.png";
 import EventHub from "./EventManagement.png";
+import csharp from "./tech/pngegg.png";
 
 export {
   EventHub,
@@ -92,4 +93,5 @@ export {
   crypto,
   BarbieBank,
   Streamhub,
+  csharp,
 };
