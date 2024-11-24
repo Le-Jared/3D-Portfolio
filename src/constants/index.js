@@ -61,7 +61,7 @@ const services = [
     icon: data_analyst,
   },
   {
-    title: "Data Engineer",
+    title: "Data Scientist",
     icon: engineer,
   },
   {
@@ -194,12 +194,21 @@ const experiences = [
     iconBg: "#E6DEDD",
     date: "2024",
     points: [
-      "Designed and implemented enterprise-scale ETL pipelines for real-time financial market data, reducing data processing time by 20% and enabling seamless market intelligence workflows",
-      "Spearheaded a AI-based text-to-SQL translation model, accelerating financial data analysis and democratizing data access",
-      "Engineered a cutting-edge market sentiment prediction model using advanced data mining algorithms, delivering real-time trend forecasting with exceptional accuracy and significantly enhancing trading strategy performance",
-      "Architected and deployed a real-time dashboard, streamlining portfolio monitoring through analytics and interactive reporting",
+      "Championed an AI-based text-to-SQL model, accelerating financial data analysis and democratizing data access",
+      "Engineered market sentiment prediction model using data mining algorithms and Angular dashboard visualization, delivering real-time trend forecasting with exceptional accuracy and significantly enhancing trading strategy performance",
+      "Designed and implemented enterprise-scale ETL pipelines and data warehouse architecture for real-time financial market data, reducing processing time by 20% and enabling seamless market intelligence workflows",
+      "Developed Java/Spring Boot microservice for automated infrastructure request management, streamlining regulatory compliance processes and maintaining 99.9% system availability",
+    ],
+  },
+  {
+    title: "Business Analyst",
+    company_name: "DBS",
+    icon: code1,
+    iconBg: "#E6DEDD",
+    date: "2024",
+    points: [
       "Bridged communication between business stakeholders and engineering teams, effectively translating complex business requirements into technical specifications and system architectures",
-      "Implemented automated QA frameworks using Selenium, ensuring 99.9% uptime and regulatory compliance",
+      "Spearheaded the development and implementation of automated reporting solutions using Python, reducing manual processing time by 70% and improving data accuracy across multiple business units",
     ],
   },
 ];
