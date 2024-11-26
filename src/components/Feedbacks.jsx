@@ -6,6 +6,36 @@ import { fadeIn } from "../utils/motion";
 import * as faceapi from 'face-api.js';
 import { Camera } from 'lucide-react';
 
+const CameraPermissionBox = ({ onAccept }) => (
+  <div className="bg-tertiary/50 p-6 rounded-xl max-w-md mx-auto mb-6">
+    <div className="space-y-4">
+      <p className="text-white text-center text-lg font-semibold mb-3">
+        Camera Access Required
+      </p>
+      <ul className="list-disc list-inside text-white space-y-2 ml-4">
+        <li>Detect faces in real-time</li>
+        <li>Analyze age and gender characteristics</li>
+        <li>Recognize facial expressions</li>
+      </ul>
+      <div className="bg-white/10 p-4 rounded-lg border border-white/20 mt-4">
+        <p className="text-sm text-white">
+          <strong className="text-violet-400 font-bold">Privacy Notice:</strong>{' '}
+          All processing is done locally in your browser. 
+          No video data is stored or transmitted to any server.
+        </p>
+      </div>
+      <div className="flex justify-center mt-4">
+        <button 
+          className="px-6 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+          onClick={onAccept}
+        >
+          Enable Camera
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 const WebcamComponent = () => {
   const videoRef = useRef(null);
   const boxCanvasRef = useRef(null);
@@ -17,9 +47,6 @@ const WebcamComponent = () => {
   const textUpdateInterval = useRef(null);
   const [permissionDenied, setPermissionDenied] = useState(
     localStorage.getItem('cameraDenied') === 'true'
-  );
-  const [showPermissionDialog, setShowPermissionDialog] = useState(
-    !localStorage.getItem('cameraDenied')
   );
 
   useEffect(() => {
@@ -34,7 +61,7 @@ const WebcamComponent = () => {
           faceapi.nets.ageGenderNet.loadFromUri('/models')
         ]);
         
-        if (showPermissionDialog || permissionDenied) {
+        if (permissionDenied) {
           return;
         }
         
@@ -70,7 +97,7 @@ const WebcamComponent = () => {
         clearInterval(textUpdateInterval.current);
       }
     };
-  }, [showPermissionDialog, permissionDenied]);
+  }, [permissionDenied]);
 
   useEffect(() => {
     if (videoRef.current && videoRef.current.readyState === 4) {
@@ -128,7 +155,7 @@ const WebcamComponent = () => {
       } catch (err) {
         console.error('Detection error:', err);
       }
-    }, 500); 
+    }, 500);
 
     textUpdateInterval.current = setInterval(() => {
       const textCtx = textCanvas.getContext('2d');
@@ -182,8 +209,7 @@ const WebcamComponent = () => {
   };
 
   const handleAcceptPermission = async () => {
-    setShowPermissionDialog(false);
-    localStorage.removeItem('cameraDenied'); // Clear the denied state if user accepts
+    localStorage.removeItem('cameraDenied');
     setPermissionDenied(false);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -205,66 +231,11 @@ const WebcamComponent = () => {
     }
   };
 
-  const handleCancelPermission = () => {
-    setShowPermissionDialog(false);
-    setPermissionDenied(true);
-    localStorage.setItem('cameraDenied', 'true');
-    setError("Camera permission denied by user");
-    if (videoRef.current?.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-    }
-    if (detectionInterval.current) {
-      clearInterval(detectionInterval.current);
-    }
-    if (textUpdateInterval.current) {
-      clearInterval(textUpdateInterval.current);
-    }
-  };
-
   return (
     <motion.div
       variants={fadeIn("up", "spring", 0.5, 0.75)}
       className="bg-black-200 p-5 rounded-3xl w-full"
     >
-      {showPermissionDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-tertiary p-6 rounded-xl max-w-md m-4">
-            <h3 className="text-xl font-bold mb-4 text-white">Camera Permission Required</h3>
-            <div className="space-y-4">
-              <p className="text-white">
-                This face analysis demo needs camera access to:
-              </p>
-              <ul className="list-disc list-inside text-white space-y-2 ml-4">
-                <li>Detect faces in real-time</li>
-                <li>Analyze age and gender characteristics</li>
-                <li>Recognize facial expressions</li>
-              </ul>
-              <div className="bg-white/10 p-4 rounded-lg border border-white/20">
-                <p className="text-sm text-white">
-                  <strong className="text-violet-400 font-bold">Privacy Notice:</strong>{' '}
-                  All processing is done locally in your browser. 
-                  No video data is stored or transmitted to any server.
-                </p>
-              </div>
-              <div className="flex justify-end space-x-4 mt-6">
-                <button 
-                  className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
-                  onClick={handleCancelPermission}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                  onClick={handleAcceptPermission}
-                >
-                  Allow Camera Access
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
@@ -273,101 +244,105 @@ const WebcamComponent = () => {
           </h2>
         </div>
 
-        <div className="flex justify-center mb-4">
-          <div className="bg-tertiary rounded-lg p-1 inline-flex">
-            <button
-              onClick={() => setActiveMode("age-gender")}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                activeMode === "age-gender"
-                  ? "bg-primary text-white"
-                  : "text-white/70 hover:text-white"
-              }`}
-            >
-              Age & Gender
-            </button>
-            <button
-              onClick={() => setActiveMode("expression")}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                activeMode === "expression"
-                  ? "bg-primary text-white"
-                  : "text-white/70 hover:text-white"
-              }`}
-            >
-              Expression
-            </button>
-          </div>
-        </div>
-
-        {isLoading && !permissionDenied && (
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center p-4">
-            <div className="text-red-500 mb-4">
-              Error: {error}
+        {permissionDenied ? (
+          <CameraPermissionBox onAccept={handleAcceptPermission} />
+        ) : (
+          <>
+            <div className="flex justify-center mb-4">
+              <div className="bg-tertiary rounded-lg p-1 inline-flex">
+                <button
+                  onClick={() => setActiveMode("age-gender")}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    activeMode === "age-gender"
+                      ? "bg-primary text-white"
+                      : "text-white/70 hover:text-white"
+                  }`}
+                >
+                  Age & Gender
+                </button>
+                <button
+                  onClick={() => setActiveMode("expression")}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    activeMode === "expression"
+                      ? "bg-primary text-white"
+                      : "text-white/70 hover:text-white"
+                  }`}
+                >
+                  Expression
+                </button>
+              </div>
             </div>
-            {permissionDenied && (
-              <button
-                onClick={() => {
-                  setPermissionDenied(false);
-                  setShowPermissionDialog(true);
-                  localStorage.removeItem('cameraDenied');
-                  setError(null);
-                }}
-                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-              >
-                Try Again
-              </button>
+
+            {isLoading && (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+              </div>
             )}
-          </div>
+
+            {error && (
+              <div className="text-center p-4">
+                <div className="text-red-500 mb-4">
+                  Error: {error}
+                </div>
+                <button
+                  onClick={() => {
+                    setPermissionDenied(false);
+                    localStorage.removeItem('cameraDenied');
+                    setError(null);
+                    handleAcceptPermission();
+                  }}
+                  className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            <div className="relative w-full max-w-[640px] mx-auto">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                onPlay={handleVideoPlay}
+                style={{
+                  width: '100%',
+                  height: 'auto'
+                }}
+                className="rounded-lg"
+              />
+              <canvas
+                ref={boxCanvasRef}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%'
+                }}
+              />
+              <canvas
+                ref={textCanvasRef}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%'
+                }}
+              />
+            </div>
+
+            <div className="mt-4 text-center">
+              <p className="text-secondary text-[14px]">
+                <Camera className="inline mr-2" />
+                {activeMode === "age-gender" 
+                  ? "Point your camera at faces to estimate age and gender"
+                  : "Point your camera at faces to detect expressions"}
+              </p>
+            </div>
+          </>
         )}
-
-        <div className="relative w-full max-w-[640px] mx-auto">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            onPlay={handleVideoPlay}
-            style={{
-              width: '100%',
-              height: 'auto'
-            }}
-            className="rounded-lg"
-          />
-          <canvas
-            ref={boxCanvasRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
-          <canvas
-            ref={textCanvasRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
-        </div>
-
-        <div className="mt-4 text-center">
-          <p className="text-secondary text-[14px]">
-            <Camera className="inline mr-2" />
-            {activeMode === "age-gender" 
-              ? "Point your camera at faces to estimate age and gender"
-              : "Point your camera at faces to detect expressions"}
-          </p>
-        </div>
       </div>
     </motion.div>
   );

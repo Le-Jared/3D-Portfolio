@@ -155,16 +155,6 @@ const technologies = [
 
 const experiences = [
   {
-    title: "Entrepreneurial and Private Business Executive",
-    company_name: "PwC",
-    icon: Exec,
-    iconBg: "#E6DEDD",
-    date: "2020",
-    points: [
-      "Advised clients on digital product strategies, enabling them to leverage emerging technologies for competitive advantage.",
-    ],
-  },
-  {
     title: "Deals Advisory Associate",
     company_name: "PwC",
     icon: Deal,
@@ -203,7 +193,7 @@ const experiences = [
   {
     title: "Business Analyst",
     company_name: "DBS",
-    icon: code1,
+    icon: Exec,
     iconBg: "#E6DEDD",
     date: "2024",
     points: [
