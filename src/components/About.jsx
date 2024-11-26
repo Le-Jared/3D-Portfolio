@@ -43,28 +43,54 @@ const About = () => {
         <h2 className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black`}>Overview.</h2>
       </div>
       <div className="flex items-center min-[1000px]:flex-row flex-col-reverse">
-        <p
-          variants={fadeIn("", "", 0.1, 1)}
-          className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
-        >
-          Hello! I'm Jared Lee, a Singaporean with a unique blend of expertise in finance, 
-          consulting, data engineering, and software development. My technical arsenal includes Python, SQL, 
-          Java, TypeScript and Unix, backed by skills in machine learning and Agile methodologies. From
-          architecting machine learning models to engineering complex financial models, I specialize in creating
-          efficient, user-friendly applications that bridge technical innovation with business objectives. My
-          experience spans developing platforms with cutting-edge tech stacks and managing projects end-to-end.
-          With a strong educational foundation in Accounting & Finance and attending a Software Engineering bootcamp, 
-          complemented by certifications in Cybersecurity and Data Science, I'm always ready to tackle new
-          challenges. Outside of coding, I'm an avid volunteer, Advanced Open Water Diver, and dance enthusiast.
-          Feel free to explore my projects and get in touch at{" "}
+      <p
+        variants={fadeIn("", "", 0.1, 1)}
+        className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
+      >
+        {/* Introduction */}
+        Hello! I'm Jared Lee, a Technical Consultant with a distinctive combination of financial 
+        acumen and software engineering expertise. My technical stack includes Python, Java, 
+        TypeScript, SQL, and various modern frameworks like React, Angular, and Spring Boot, 
+        supported by strong DevOps practices using Git, Jenkins.
+        
+        {/* Current Role */}
+        <div className="mt-4">
+          Currently at DBS Bank through FDM Group, I serve dual roles as a Software Engineer 
+          and Business Analyst, where I've successfully developed AI-based solutions and 
+          automated reporting tools. My previous experience includes positions at Argile 
+          Partners as a Management Consultant and PwC as a Deals Advisory Associate, where 
+          I specialized in financial modeling, business restructuring, and operational optimization.
+        </div>
+
+        {/* Education & Certifications */}
+        <div className="mt-4">
+          My educational foundation combines a Bachelor of Commerce in Accounting and Corporate 
+          Finance from the University of Adelaide with intensive Software Engineering training 
+          from General Assembly. I've further enhanced my expertise with Google Cybersecurity 
+          and IBM Data Science Professional certifications.
+        </div>
+
+        {/* Professional Interests & Projects */}
+        <div className="mt-4">
+          I'm particularly passionate about bridging the gap between business and technology, 
+          having demonstrated this through projects like implementing enterprise-scale ETL 
+          pipelines and developing AI-based text-to-SQL models. Beyond my professional work, 
+          I'm an Advanced Open Water Diver, active volunteer with NCSF Uplift, and enthusiast 
+          in dance and photography.
+        </div>
+
+        {/* Contact Information */}
+        <div className="mt-4">
+          You can explore my work at my portfolio website or reach me via email at{" "}
           <a
             href="mailto:jared.lee.zhen.yan@gmail.com"
             className="animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black"
           >
-            jared.lee.zhen.yan@gmail.com.
-          </a>{" "}
-          I'm always open to new opportunities and collaborations!{" "}
-        </p>
+            jared.lee.zhen.yan@gmail.com
+          </a>
+          . I'm always open to new opportunities and collaborations!
+        </div>
+      </p>
         <Tilt className="xs:w-[350px] xs:h-[350px] w-full h-full m-auto max-[1000px]:my-14">
           <div
             variants={fadeIn("", "", 0.5, 1)}
