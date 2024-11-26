@@ -521,8 +521,3 @@
   border-radius: 8px; /* Optional: Adds rounded corners to your images */
 }
 
-@media (max-width: 768px) {
-  canvas {
-    touch-action: none;
-  }
-}
