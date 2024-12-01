@@ -34,6 +34,7 @@ import {
   Exec,
   EventHub,
   csharp,
+  WebScrapper,
 
 } from "../assets";
 export const navLinks = [
@@ -224,6 +225,19 @@ const projects = [
     ],
     image: Streamhub,
     source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
+  },
+  {
+    name: "WebScrapper",
+    description:
+      "A Python-based web scraping tool that extracts and analyzes product data from Lazada's marketplace.",
+    tags: [
+      {
+        name: "Python",
+        color: "blue-text-gradient",
+      },
+    ],
+    image: WebScrapper,
+    source_code_link: "https://github.com/Le-Jared/web-scrapper",
   },
   {
     name: "Banking Application",

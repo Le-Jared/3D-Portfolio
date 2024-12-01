@@ -45,9 +45,11 @@ import Deal from "./deal.png";
 import Exec from "./exec.png";
 import EventHub from "./EventManagement.png";
 import csharp from "./tech/pngegg.png";
+import WebScrapper from "./WebScrapper.png";
 
 export {
   EventHub,
+  WebScrapper,
   Exec,
   backend,
   Deal,
