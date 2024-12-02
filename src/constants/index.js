@@ -227,7 +227,7 @@ const projects = [
     source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
   },
   {
-    name: "Stealh Selenium Scrapper",
+    name: "Stealth Selenium Scrapper",
     description:
       "A Python-based web scraping framework using Selenium with advanced anti-detection features",
     tags: [
