@@ -227,17 +227,21 @@ const projects = [
     source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
   },
   {
-    name: "WebScrapper",
+    name: "Stealh Selenium Scrapper",
     description:
-      "A Python-based web scraping tool that extracts and analyzes product data from Lazada's marketplace.",
+      "A Python-based web scraping framework using Selenium with advanced anti-detection features",
     tags: [
       {
         name: "Python",
         color: "blue-text-gradient",
       },
+      {
+        name: "Selenium",
+        color: "silver-text-gradient",
+      },
     ],
     image: WebScrapper,
-    source_code_link: "https://github.com/Le-Jared/web-scrapper",
+    source_code_link: "https://github.com/Le-Jared/stealth-selenium-scrapper",
   },
   {
     name: "Banking Application",
