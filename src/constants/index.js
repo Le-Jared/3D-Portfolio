@@ -186,9 +186,9 @@ const experiences = [
     date: "2024",
     points: [
       "Championed an AI-based text-to-SQL model, accelerating financial data analysis and democratizing data access",
-      "Engineered market sentiment prediction model using data mining algorithms and Angular dashboard visualization, delivering real-time trend forecasting with exceptional accuracy and significantly enhancing trading strategy performance",
+      "Engineered full-stack market sentiment platform using Python/Flask API backend and Angular dashboard, integrating data mining algorithms for real-time trading insights",
       "Designed and implemented enterprise-scale ETL pipelines and data warehouse architecture for real-time financial market data, reducing processing time by 20% and enabling seamless market intelligence workflows",
-      "Developed Java/Spring Boot microservice for automated infrastructure request management, streamlining regulatory compliance processes and maintaining 99.9% system availability",
+      "Automated end-to-end dashboard testing using Selenium WebDriver with Java/Spring Boot framework, achieving 99.9% test coverage across critical UI functionalities and user workflows",
     ],
   },
   {
