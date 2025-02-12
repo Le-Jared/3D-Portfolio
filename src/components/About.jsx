@@ -1,7 +1,6 @@
 import React from "react";
 import { Tilt } from "react-tilt";
 import { motion } from "framer-motion";
-
 import { styles } from "../styles";
 import { services } from "../constants";
 import { SectionWrapper } from "../hoc";
@@ -48,19 +47,19 @@ const About = () => {
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
         {/* Introduction */}
-        Hello! I'm Jared Lee, a Technical Consultant with a distinctive combination of financial 
+        Hello! I'm Jared Lee, a FinTech professional with a distinctive combination of financial 
         acumen and software engineering expertise. My technical stack includes Python, Java, 
         TypeScript, SQL, and various modern frameworks like React, Angular, and Spring Boot, 
         supported by strong DevOps practices using Git, Jenkins.
         
         {/* Current Role */}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           Currently at DBS Bank through FDM Group, I serve dual roles as a Software Engineer 
           and Business Analyst, where I've successfully developed AI-based solutions and 
           automated reporting tools. My previous experience includes positions at Argile 
           Partners as a Management Consultant and PwC as a Deals Advisory Associate, where 
           I specialized in financial modeling, business restructuring, and operational optimization.
-        </div>
+        </div> */}
 
         {/* Education & Certifications */}
         <div className="mt-4">

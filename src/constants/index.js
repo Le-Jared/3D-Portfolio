@@ -191,17 +191,6 @@ const experiences = [
       "Automated end-to-end dashboard testing using Selenium WebDriver with Java/Spring Boot framework, achieving 99.9% test coverage across critical UI functionalities and user workflows",
     ],
   },
-  {
-    title: "Business Analyst",
-    company_name: "DBS",
-    icon: Exec,
-    iconBg: "#E6DEDD",
-    date: "2024",
-    points: [
-      "Bridged communication between business stakeholders and engineering teams, effectively translating complex business requirements into technical specifications and system architectures",
-      "Spearheaded the development and implementation of automated reporting solutions using Python, reducing manual processing time by 70% and improving data accuracy across multiple business units",
-    ],
-  },
 ];
 
 const projects = [
