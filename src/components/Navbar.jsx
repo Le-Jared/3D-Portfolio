@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { styles } from "../styles";
 import { navLinks } from "../constants";
 import { menu, close } from "../assets";
-import resume from "/src/Jared Lee Zhen Yan - Resume.pdf";
+import resume from "/src/Jared Lee Zhen Yan - CV.pdf";
 import { Logo } from "../assets"; 
 
 const Navbar = () => {
@@ -72,10 +72,10 @@ const Navbar = () => {
 
         <ul className="list-none hidden sm:flex flex-row items-center gap-10">
           <li>
-            <a href={resume} download="Jared Lee Zhen Yan - Resume.pdf" style={{ textDecoration: 'none' }}>
+            <a href={resume} download="Jared Lee Zhen Yan - CV.pdf" style={{ textDecoration: 'none' }}>
               <button
                 style={buttonStyle}
-                onClick={() => setActive("Download Resume")}
+                onClick={() => setActive("Download CV")}
               >
                 <span style={buttonContentStyle}>
                   <svg
@@ -118,10 +118,10 @@ const Navbar = () => {
           >
             <ul className='list-none flex justify-end items-start flex-1 flex-col gap-4'>
               <li>
-                <a href={resume} download="Jared Lee Zhen Yan - Resume.pdf" style={{ textDecoration: 'none' }}>
+                <a href={resume} download="Jared Lee Zhen Yan - CV.pdf" style={{ textDecoration: 'none' }}>
                   <button
                     style={buttonStyle}
-                    onClick={() => setActive("Download Resume")}
+                    onClick={() => setActive("Download CV")}
                   >
                     <span style={buttonContentStyle}>
                       <svg
@@ -131,7 +131,7 @@ const Navbar = () => {
                       >
                         <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
                       </svg>
-                      Download Resume
+                      Download CV
                     </span>
                   </button>
                 </a>
