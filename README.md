@@ -22,6 +22,6 @@ Welcome to my interactive 3D portfolio! This project combines cutting-edge web t
 
 ## 🎥 Demo
 
-Check out the live demo [here](https://your-portfolio-url.com).
+Check out the live demo [here](https://jared-lee.vercel.app/).
 
 
