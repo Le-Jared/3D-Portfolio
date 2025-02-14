@@ -20,8 +20,8 @@ Welcome to my interactive 3D portfolio! This project combines cutting-edge web t
 - **Styling**: Tailwind CSS
 - **Animation**: GSAP (GreenSock Animation Platform)
 
-## 🎥 Demo
+## 🎥 Live Project
 
-Check out the live demo [here](https://jared-lee.vercel.app/).
+Check out the live website [here](https://jared-lee.vercel.app/).
 
 
