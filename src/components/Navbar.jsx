@@ -5,7 +5,7 @@ import { navLinks } from "../constants";
 import { menu, close } from "../assets";
 import { Logo } from "../assets"; 
 
-const resume = "/Jared Lee Zhen Yan - CV.pdf";
+const resume = "/Jared Lee Zhen Yan - Resume.pdf";
 const DownloadButton = () => (
   <li>
     <a href={resume} download className="no-underline">
@@ -17,7 +17,7 @@ const DownloadButton = () => (
         >
           <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
         </svg>
-        Download CV
+        Download Resume
       </span>
     </a>
   </li>

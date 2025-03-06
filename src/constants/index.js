@@ -365,7 +365,7 @@ const projects = [
     source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
   },
   {
-    name: "Portfolio Face Recognition",
+    name: "Face Recognition",
     description:
       "Web application that performs real-time webcam & video face tracking as well as detect and identify faces from images with the help of pre-trained models",
     tags: [
