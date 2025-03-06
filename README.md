@@ -8,8 +8,7 @@ Welcome to my interactive 3D portfolio! This project combines cutting-edge web t
 
 - 🎭 **Facial Expression Detection**: Analyzes user's emotions in real-time
 - 👤 **Age and Gender Estimation**: Provides demographic insights
-- 🖼️ **3D Project Showcase**: Interactive 3D models of my projects
-- 🎨 **Dynamic Theming**: Adapts based on detected user characteristics
+- 🖼️ **3D Project Showcase**: Interactive 3D model
 - 📱 **Responsive Design**: Seamless experience across devices
 
 ## 🛠️ Technologies Used
@@ -20,8 +19,8 @@ Welcome to my interactive 3D portfolio! This project combines cutting-edge web t
 - **Styling**: Tailwind CSS
 - **Animation**: GSAP (GreenSock Animation Platform)
 
-## 🎥 Demo
+## 🎥 Live Project
 
-Check out the live demo [here](https://your-portfolio-url.com).
+Check out the live website [here](https://jared-lee.vercel.app/).
 
 
