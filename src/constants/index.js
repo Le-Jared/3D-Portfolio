@@ -33,6 +33,7 @@ import {
   Deal,
   Exec,
   EventHub,
+  Agender,
   csharp,
   WebScrapper,
 
@@ -200,15 +201,7 @@ const projects = [
       "StreamHub is a communication platform that uses Kafka for real-time messaging, offering secure access like Teleport, live chat with emoji reactions, and speech-to-text functionality for distributed team collaboration.",
     tags: [
       {
-        name: "React",
-        color: "pink-text-gradient",
-      },
-      {
-        name: "SpringBoot",
-        color: "green-text-gradient",
-      },
-      {
-        name: "PostgreSQL",
+        name: "Python",
         color: "blue-text-gradient",
       },
     ],
@@ -370,6 +363,19 @@ const projects = [
     ],
     image: huddle,
     source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
+  },
+  {
+    name: "Portfolio Face Recognition",
+    description:
+      "Web application that performs real-time webcam & video face tracking as well as detect and identify faces from images with the help of pre-trained models",
+    tags: [
+      {
+        name: "React",
+        color: "pink-text-gradient",
+      },
+    ],
+    image: Agender,
+    source_code_link: "https://github.com/Le-Jared/3D-Portfolio",
   },
 ];
 

@@ -46,8 +46,10 @@ import Exec from "./exec.png";
 import EventHub from "./EventManagement.png";
 import csharp from "./tech/pngegg.png";
 import WebScrapper from "./WebScrapper.png";
+import Agender from "./Agender.png";
 
 export {
+  Agender,
   EventHub,
   WebScrapper,
   Exec,
