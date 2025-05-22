@@ -192,6 +192,18 @@ const experiences = [
       "Automated end-to-end dashboard testing using Selenium WebDriver with Java/Spring Boot framework, achieving 99.9% test coverage across critical UI functionalities and user workflows",
     ],
   },
+  {
+    title: "Manager, Valuation Control (Developer)",
+    company_name: "Standard Chartered Bank",
+    icon: code1,
+    iconBg: "#E6DEDD",
+    date: "2025",
+    points: [
+      "Spearhead the design and implementation of quantitative validation tools for complex financial instruments, collaborating with trading desks to enhance valuation methodologies and control processes",
+      "Develop and maintain sophisticated Python-based valuation models and automated frameworks for independent price verification (IPV) and fair value adjustments, ensuring robust risk control and regulatory compliance",
+      "Architected and implemented CI/CD pipeline in Azure DevOps for automated deployment of Django applications, enhancing deployment efficiency and reliability",
+    ],
+  },
 ];
 
 const projects = [
