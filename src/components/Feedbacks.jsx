@@ -169,9 +169,13 @@ const WebcamComponent = () => {
 
     const { box } = det.detection;
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#4287f5";
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#60a5fa"; // light blue
+    ctx.shadowColor = "rgba(96,165,250,0.45)";
+    ctx.shadowBlur = 10;
     ctx.strokeRect(box.x, box.y, box.width, box.height);
+    ctx.restore();
 
     const mode = activeModeRef.current;
 
@@ -179,7 +183,7 @@ const WebcamComponent = () => {
     if (mode === "age-gender") {
       const age = det.age ? Math.round(det.age) : "-";
       const gender = det.gender || "-";
-      label = `Age: ${age} | Gender: ${gender}`;
+      label = `Age: ${age}  •  Gender: ${gender}`;
     } else {
       const expressions = det.expressions || {};
       const best = Object.entries(expressions).reduce(
@@ -189,18 +193,38 @@ const WebcamComponent = () => {
       label = `Expression: ${best[0]} (${(best[1] * 100).toFixed(0)}%)`;
     }
 
-    ctx.font = "15px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial";
+    const fontSize = Math.max(14, Math.min(20, Math.round(vw / 28)));
+    ctx.font = `600 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial`;
+    ctx.textBaseline = "alphabetic";
+
+    const padX = 10;
+    const padY = 7;
     const textW = ctx.measureText(label).width;
+    const boxW = textW + padX * 2;
+    const boxH = fontSize + padY * 2;
+    const x = Math.max(8, Math.min(box.x, vw - boxW - 8));
+    const yTop = box.y - boxH - 8;
+    const y = yTop >= 8 ? yTop : Math.max(8, box.y + 8);
 
-    const x = Math.max(8, Math.min(box.x, vw - (textW + 20) - 8));
-    const y = Math.max(24, box.y - 10);
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.78)";
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 1;
+    ctx.shadowColor = "rgba(0,0,0,0.45)";
+    ctx.shadowBlur = 8;
 
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
-    roundRectSafe(ctx, x, y - 20, textW + 20, 24, 6);
+    roundRectSafe(ctx, x, y, boxW, boxH, 10);
     ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(0,0,0,0.75)";
+    ctx.strokeText(label, x + padX, y + boxH - padY);
 
-    ctx.fillStyle = "#fff";
-    ctx.fillText(label, x + 10, y - 4);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(label, x + padX, y + boxH - padY);
+    ctx.restore();
   }, []);
 
   const detectOnce = useCallback(async () => {
@@ -355,8 +379,8 @@ const WebcamComponent = () => {
         </div>
 
         {/* VIDEO AREA */}
-        <div className="w-full max-w-[640px] mx-auto">
-          <div className="relative w-full aspect-[4/3] sm:aspect-video rounded-lg overflow-hidden bg-black/20">
+        <div className="w-full mx-auto sm:max-w-[640px]">
+          <div className="relative w-full aspect-[3/4] sm:aspect-video rounded-lg overflow-hidden bg-black/20">
             <video
               ref={videoRef}
               autoPlay
