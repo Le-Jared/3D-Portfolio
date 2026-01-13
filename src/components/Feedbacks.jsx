@@ -50,9 +50,8 @@ const WebcamComponent = () => {
   const [permissionDenied, setPermissionDenied] = useState(
     localStorage.getItem("cameraDenied") === "true"
   );
-  const [showPermissionDialog, setShowPermissionDialog] = useState(
-    !localStorage.getItem("cameraDenied")
-  );
+
+  const [cameraStarted, setCameraStarted] = useState(false);
 
   useEffect(() => {
     activeModeRef.current = activeMode;
@@ -64,6 +63,7 @@ const WebcamComponent = () => {
       streamRef.current = null;
     }
     if (videoRef.current) videoRef.current.srcObject = null;
+    setCameraStarted(false);
   }, []);
 
   const stopLoop = useCallback(() => {
@@ -123,6 +123,12 @@ const WebcamComponent = () => {
     setError(null);
     setIsLoading(true);
 
+    if (!window.isSecureContext) {
+      setIsLoading(false);
+      setError("Camera requires HTTPS (secure context).");
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -140,9 +146,12 @@ const WebcamComponent = () => {
         await videoRef.current.play().catch(() => {});
       }
 
+      setCameraStarted(true);
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
+      setPermissionDenied(true);
+      localStorage.setItem("cameraDenied", "true");
       setError(err?.message || "Unable to access camera");
     }
   }, []);
@@ -205,9 +214,7 @@ const WebcamComponent = () => {
 
     const mode = activeModeRef.current;
 
-    let chain = faceapi
-      .detectSingleFace(video, DETECTOR_OPTIONS)
-      .withFaceLandmarks();
+    let chain = faceapi.detectSingleFace(video, DETECTOR_OPTIONS).withFaceLandmarks();
 
     if (mode === "age-gender") chain = chain.withAgeAndGender();
     else chain = chain.withFaceExpressions();
@@ -229,7 +236,7 @@ const WebcamComponent = () => {
     const intervalMs = 1000 / DETECTION_FPS;
     if (t - lastDetectTimeRef.current > intervalMs) {
       lastDetectTimeRef.current = t;
-      detectOnce().catch((e) => console.error("Detection error:", e));
+      detectOnce().catch(() => {});
     }
 
     rafRef.current = requestAnimationFrame(loop);
@@ -276,12 +283,8 @@ const WebcamComponent = () => {
   }, [activeMode, loadModeModels, modelsReady]);
 
   useEffect(() => {
-    if (!modelsReady) return;
-    if (showPermissionDialog || permissionDenied) return;
-
-    startCamera();
     return () => cleanupAll();
-  }, [modelsReady, showPermissionDialog, permissionDenied, startCamera, cleanupAll]);
+  }, [cleanupAll]);
 
   const handleVideoReady = useCallback(() => {
     setupCanvasToVideo();
@@ -290,26 +293,17 @@ const WebcamComponent = () => {
     rafRef.current = requestAnimationFrame(loop);
   }, [setupCanvasToVideo, stopLoop, loop]);
 
-  const handleAcceptPermission = () => {
-    setShowPermissionDialog(false);
+  const handleEnableCamera = async () => {
     localStorage.removeItem("cameraDenied");
     setPermissionDenied(false);
     setError(null);
-  };
-
-  const handleCancelPermission = () => {
-    setShowPermissionDialog(false);
-    setPermissionDenied(true);
-    localStorage.setItem("cameraDenied", "true");
-    setError("Camera permission denied by user");
-    cleanupAll();
+    await startCamera();
   };
 
   const handleRetry = () => {
-    setError(null);
-    setPermissionDenied(false);
-    setShowPermissionDialog(true);
     localStorage.removeItem("cameraDenied");
+    setPermissionDenied(false);
+    setError(null);
   };
 
   const switchMode = (mode) => {
@@ -317,35 +311,13 @@ const WebcamComponent = () => {
     setActiveMode(mode);
   };
 
+  const showOverlay = !cameraStarted || isLoading || error;
+
   return (
     <motion.div
       variants={fadeIn("up", "spring", 0.5, 0.75)}
       className="bg-black-200 p-5 rounded-3xl w-full"
     >
-      {showPermissionDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-tertiary p-6 rounded-xl max-w-md m-4">
-            <h3 className="text-xl font-bold mb-4 text-white">Camera Permission Required</h3>
-            <div className="flex justify-end space-x-4 mt-6">
-              <button
-                type="button"
-                className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
-                onClick={handleCancelPermission}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                onClick={handleAcceptPermission}
-              >
-                Allow Camera Access
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
@@ -384,28 +356,6 @@ const WebcamComponent = () => {
           </div>
         </div>
 
-        {isLoading && !permissionDenied && (
-          <div className="flex items-center justify-center py-10">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center p-4">
-            <div className="text-red-500 mb-4">Error: {error}</div>
-            {permissionDenied && (
-              <button
-                type="button"
-                onClick={handleRetry}
-                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors inline-flex items-center gap-2"
-              >
-                <RefreshCw size={18} />
-                Try Again
-              </button>
-            )}
-          </div>
-        )}
-
         <div className="relative w-full max-w-[640px] mx-auto">
           <video
             ref={videoRef}
@@ -415,6 +365,7 @@ const WebcamComponent = () => {
             onLoadedMetadata={handleVideoReady}
             className="rounded-lg w-full h-auto"
           />
+
           <canvas
             ref={overlayCanvasRef}
             style={{
@@ -426,6 +377,45 @@ const WebcamComponent = () => {
               pointerEvents: "none",
             }}
           />
+
+          {showOverlay && (
+            <div className="absolute inset-0 rounded-lg bg-black/60 flex items-center justify-center">
+              <div className="text-center px-6">
+                <div className="text-white font-semibold text-lg mb-2">
+                  {error ? "Camera not available" : isLoading ? "Starting..." : "Enable your camera to begin"}
+                </div>
+
+                <div className="text-white/70 text-sm leading-relaxed max-w-md mx-auto mb-6">
+                  Your camera feed is processed in real-time in your browser only. We don’t record, store, or upload any video or face data.
+                </div>
+
+                {error && <div className="text-red-300 text-sm mb-4">{error}</div>}
+
+                {!isLoading && (
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleEnableCamera}
+                      className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                    >
+                      Enable Camera
+                    </button>
+
+                    {permissionDenied && (
+                      <button
+                        type="button"
+                        onClick={handleRetry}
+                        className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center gap-2"
+                      >
+                        <RefreshCw size={18} />
+                        Try Again
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 text-center">
