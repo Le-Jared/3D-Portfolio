@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { motion } from "framer-motion";
 import * as faceapi from "face-api.js";
 import { Camera, RefreshCw } from "lucide-react";
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
-import { fadeIn } from "../utils/motion";
 
 const MODEL_URL = `${import.meta.env.BASE_URL}models/`;
 
@@ -112,10 +110,9 @@ const WebcamComponent = () => {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.floor(vw * dpr);
     canvas.height = Math.floor(vh * dpr);
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
 
     const ctx = canvas.getContext("2d");
+    // Draw in CSS pixels while keeping retina sharpness
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }, []);
 
@@ -214,7 +211,9 @@ const WebcamComponent = () => {
 
     const mode = activeModeRef.current;
 
-    let chain = faceapi.detectSingleFace(video, DETECTOR_OPTIONS).withFaceLandmarks();
+    let chain = faceapi
+      .detectSingleFace(video, DETECTOR_OPTIONS)
+      .withFaceLandmarks();
 
     if (mode === "age-gender") chain = chain.withAgeAndGender();
     else chain = chain.withFaceExpressions();
@@ -230,17 +229,20 @@ const WebcamComponent = () => {
     latestDetectionRef.current = faceapi.resizeResults(raw, displaySize);
   }, []);
 
-  const loop = useCallback((t) => {
-    drawOverlay();
+  const loop = useCallback(
+    (t) => {
+      drawOverlay();
 
-    const intervalMs = 1000 / DETECTION_FPS;
-    if (t - lastDetectTimeRef.current > intervalMs) {
-      lastDetectTimeRef.current = t;
-      detectOnce().catch(() => {});
-    }
+      const intervalMs = 1000 / DETECTION_FPS;
+      if (t - lastDetectTimeRef.current > intervalMs) {
+        lastDetectTimeRef.current = t;
+        detectOnce().catch(() => {});
+      }
 
-    rafRef.current = requestAnimationFrame(loop);
-  }, []);
+      rafRef.current = requestAnimationFrame(loop);
+    },
+    [drawOverlay, detectOnce]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -314,10 +316,7 @@ const WebcamComponent = () => {
   const showOverlay = !cameraStarted || isLoading || error;
 
   return (
-    <motion.div
-      variants={fadeIn("up", "spring", 0.5, 0.75)}
-      className="bg-black-200 p-5 rounded-3xl w-full"
-    >
+    <div className="bg-black-200 p-5 rounded-3xl w-full">
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
@@ -356,80 +355,76 @@ const WebcamComponent = () => {
           </div>
         </div>
 
-        <div className="relative w-full max-w-[640px] mx-auto">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            onLoadedMetadata={handleVideoReady}
-            className="rounded-lg w-full h-auto"
-          />
+        {/* VIDEO AREA (locked aspect ratio; overlay contained) */}
+        <div className="w-full max-w-[640px] mx-auto">
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black/20">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              onLoadedMetadata={handleVideoReady}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
 
-          <canvas
-            ref={overlayCanvasRef}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              pointerEvents: "none",
-            }}
-          />
+            <canvas
+              ref={overlayCanvasRef}
+              className="absolute inset-0 w-full h-full pointer-events-none"
+            />
 
-        {/* OVERLAY (mobile-friendly) */}
-        {showOverlay && (
-          <div className="absolute inset-0 rounded-lg bg-black/60 flex items-center justify-center p-4 sm:p-6">
-            <div className="w-full max-w-sm sm:max-w-md text-center">
-              {/* Title: wraps nicely, responsive sizing */}
-              <div className="text-white font-semibold text-base sm:text-lg leading-snug mb-2 break-words">
-                {error
-                  ? "Camera not available"
-                  : isLoading
-                  ? "Starting..."
-                  : "Enable your camera to begin"}
-              </div>
+            {showOverlay && (
+              <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-6 bg-black/60">
+                <div className="w-full max-w-[22rem] sm:max-w-md rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 shadow-lg p-4 sm:p-5 text-center">
+                  <div className="text-white font-semibold text-base sm:text-lg leading-snug">
+                    {error ? (
+                      "Camera not available"
+                    ) : isLoading ? (
+                      "Starting..."
+                    ) : (
+                      <>
+                        <span className="block">Enable your camera</span>
+                        <span className="block">to begin</span>
+                      </>
+                    )}
+                  </div>
 
-              {/* Disclaimer: smaller on mobile, comfortable line-height */}
-              <div className="text-white/70 text-xs sm:text-sm leading-relaxed mx-auto mb-5 sm:mb-6">
-                Your camera feed is processed in real-time in your browser only. We don’t record, store, or
-                upload any video or face data.
-              </div>
+                  <div className="mt-3 text-white/70 text-xs sm:text-sm leading-relaxed">
+                    Your camera feed is processed in real-time in your browser only. We don’t
+                    record, store, or upload any video or face data.
+                  </div>
 
-              {/* Error: keep it readable and not too wide */}
-              {error && (
-                <div className="text-red-300 text-xs sm:text-sm mb-4 break-words">
-                  {error}
-                </div>
-              )}
+                  {error && (
+                    <div className="mt-3 text-red-300 text-xs sm:text-sm break-words">
+                      {error}
+                    </div>
+                  )}
 
-              {/* Buttons: stack on mobile, row on larger screens */}
-              {!isLoading && (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleEnableCamera}
-                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                  >
-                    Enable Camera
-                  </button>
+                  {!isLoading && (
+                    <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                      <button
+                        type="button"
+                        onClick={handleEnableCamera}
+                        className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                      >
+                        Enable Camera
+                      </button>
 
-                  {permissionDenied && (
-                    <button
-                      type="button"
-                      onClick={handleRetry}
-                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
-                    >
-                      <RefreshCw size={18} />
-                      Try Again
-                    </button>
+                      {permissionDenied && (
+                        <button
+                          type="button"
+                          onClick={handleRetry}
+                          className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
+                        >
+                          <RefreshCw size={18} />
+                          Try Again
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        )}
         </div>
 
         <div className="mt-4 text-center">
@@ -441,7 +436,7 @@ const WebcamComponent = () => {
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
