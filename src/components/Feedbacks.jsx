@@ -112,7 +112,6 @@ const WebcamComponent = () => {
     canvas.height = Math.floor(vh * dpr);
 
     const ctx = canvas.getContext("2d");
-    // Draw in CSS pixels while keeping retina sharpness
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }, []);
 
@@ -355,9 +354,9 @@ const WebcamComponent = () => {
           </div>
         </div>
 
-        {/* VIDEO AREA (locked aspect ratio; overlay contained) */}
+        {/* VIDEO AREA */}
         <div className="w-full max-w-[640px] mx-auto">
-          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black/20">
+          <div className="relative w-full aspect-[4/3] sm:aspect-video rounded-lg overflow-hidden bg-black/20">
             <video
               ref={videoRef}
               autoPlay
@@ -373,62 +372,73 @@ const WebcamComponent = () => {
             />
 
             {showOverlay && (
-              <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-6 bg-black/60">
-                <div className="w-full max-w-[22rem] sm:max-w-md rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 shadow-lg p-4 sm:p-5 text-center">
-                  <div className="text-white font-semibold text-base sm:text-lg leading-snug">
-                    {error ? (
-                      "Camera not available"
-                    ) : isLoading ? (
-                      "Starting..."
-                    ) : (
-                      <>
-                        <span className="block">Enable your camera</span>
-                        <span className="block">to begin</span>
-                      </>
-                    )}
-                  </div>
+              <div className="absolute inset-0 bg-black/60 p-3 sm:p-6">
+                <div className="h-full w-full flex items-center justify-center">
+                  {/* Card fills available height; internal content can scroll */}
+                  <div className="w-full max-w-[22rem] sm:max-w-md h-full rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 shadow-lg overflow-hidden flex flex-col">
+                    {/* Scroll area (feedback box is auto-height inside this) */}
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+                      <div className="text-white font-semibold text-base sm:text-lg leading-snug text-center">
+                        {error ? (
+                          "Camera not available"
+                        ) : isLoading ? (
+                          "Starting..."
+                        ) : (
+                          <>
+                            <span className="block">Enable your camera</span>
+                            <span className="block">to begin</span>
+                          </>
+                        )}
+                      </div>
 
-                  <div className="mt-3 text-white/70 text-xs sm:text-sm leading-relaxed">
-                    Your camera feed is processed in real-time in your browser only. We don’t
-                    record, store, or upload any video or face data.
-                  </div>
+                      {/* AUTO-HEIGHT feedback box (no min/max height) */}
+                      <div className="mt-4 rounded-lg bg-white/5 border border-white/10 p-4 sm:p-5 text-white/80 text-xs sm:text-sm leading-relaxed">
+                        Your camera feed is processed in real-time in your browser only. We don’t
+                        record, store, or upload any video or face data.
+                      </div>
 
-                  {error && (
-                    <div className="mt-3 text-red-300 text-xs sm:text-sm break-words">
-                      {error}
-                    </div>
-                  )}
-
-                  {!isLoading && (
-                    <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                      <button
-                        type="button"
-                        onClick={handleEnableCamera}
-                        className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                      >
-                        Enable Camera
-                      </button>
-
-                      {permissionDenied && (
-                        <button
-                          type="button"
-                          onClick={handleRetry}
-                          className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
-                        >
-                          <RefreshCw size={18} />
-                          Try Again
-                        </button>
+                      {error && (
+                        <div className="mt-3 text-red-300 text-xs sm:text-sm break-words text-center">
+                          {error}
+                        </div>
                       )}
                     </div>
-                  )}
+
+                    {/* Footer always visible */}
+                    {!isLoading && (
+                      <div className="p-4 sm:p-5 pt-0 bg-black/30 border-t border-white/10">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
+                            type="button"
+                            onClick={handleEnableCamera}
+                            className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                          >
+                            Enable Camera
+                          </button>
+
+                          {permissionDenied && (
+                            <button
+                              type="button"
+                              onClick={handleRetry}
+                              className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
+                            >
+                              <RefreshCw size={18} />
+                              Try Again
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
 
+        {/* Smaller on mobile */}
         <div className="mt-4 text-center">
-          <p className="text-secondary text-[14px]">
+          <p className="text-secondary text-[11px] sm:text-[12px] leading-snug">
             <Camera className="inline mr-2" />
             {activeMode === "age-gender"
               ? "Point your camera at a single face to estimate age and gender"
