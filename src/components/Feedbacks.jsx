@@ -1,224 +1,320 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import * as faceapi from "face-api.js";
+import { Camera, RefreshCw } from "lucide-react";
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn } from "../utils/motion";
-import * as faceapi from 'face-api.js';
-import { Camera } from 'lucide-react';
+
+const MODEL_URL = `${import.meta.env.BASE_URL}models/`;
+
+const DETECTION_FPS = 10;
+const DETECTOR_OPTIONS = new faceapi.TinyFaceDetectorOptions({
+  inputSize: 224,
+  scoreThreshold: 0.5,
+});
+
+function roundRectSafe(ctx, x, y, w, h, r = 8) {
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+    return;
+  }
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+}
 
 const WebcamComponent = () => {
   const videoRef = useRef(null);
-  const boxCanvasRef = useRef(null);
-  const textCanvasRef = useRef(null);
+  const overlayCanvasRef = useRef(null);
+
+  const rafRef = useRef(null);
+  const lastDetectTimeRef = useRef(0);
+
+  const latestDetectionRef = useRef(null);
+  const modeModelReadyRef = useRef(false);
+  const streamRef = useRef(null);
+
   const [isLoading, setIsLoading] = useState(true);
+  const [modelsReady, setModelsReady] = useState(false);
   const [error, setError] = useState(null);
+
   const [activeMode, setActiveMode] = useState("age-gender");
-  const detectionInterval = useRef(null);
-  const textUpdateInterval = useRef(null);
+  const activeModeRef = useRef(activeMode);
+
   const [permissionDenied, setPermissionDenied] = useState(
-    localStorage.getItem('cameraDenied') === 'true'
+    localStorage.getItem("cameraDenied") === "true"
   );
   const [showPermissionDialog, setShowPermissionDialog] = useState(
-    !localStorage.getItem('cameraDenied')
+    !localStorage.getItem("cameraDenied")
   );
 
   useEffect(() => {
-    const loadModels = async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-          faceapi.nets.faceExpressionNet.loadFromUri('/models'),
-          faceapi.nets.ageGenderNet.loadFromUri('/models')
-        ]);
-        
-        if (showPermissionDialog || permissionDenied) {
-          return;
-        }
-        
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { 
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            facingMode: 'user'
-          } 
-        });
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-        
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
-      }
-    };
-
-    loadModels();
-
-    return () => {
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      }
-      if (detectionInterval.current) {
-        clearInterval(detectionInterval.current);
-      }
-      if (textUpdateInterval.current) {
-        clearInterval(textUpdateInterval.current);
-      }
-    };
-  }, [showPermissionDialog, permissionDenied]);
-
-  useEffect(() => {
-    if (videoRef.current && videoRef.current.readyState === 4) {
-      if (detectionInterval.current) {
-        clearInterval(detectionInterval.current);
-      }
-      if (textUpdateInterval.current) {
-        clearInterval(textUpdateInterval.current);
-      }
-      startDetection();
-    }
+    activeModeRef.current = activeMode;
   }, [activeMode]);
 
-  const startDetection = () => {
-    const video = videoRef.current;
-    const boxCanvas = boxCanvasRef.current;
-    const textCanvas = textCanvasRef.current;
+  const stopStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
 
-    if (!video || !boxCanvas || !textCanvas) return;
+  const stopLoop = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+  }, []);
 
-    boxCanvas.width = video.videoWidth;
-    boxCanvas.height = video.videoHeight;
-    textCanvas.width = video.videoWidth;
-    textCanvas.height = video.videoHeight;
+  const cleanupAll = useCallback(() => {
+    stopLoop();
+    stopStream();
+    latestDetectionRef.current = null;
+  }, [stopLoop, stopStream]);
 
-    const displaySize = {
-      width: video.videoWidth,
-      height: video.videoHeight
-    };
+  const loadBaseModels = useCallback(async () => {
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+    ]);
+  }, []);
 
-    faceapi.matchDimensions(boxCanvas, displaySize);
-    faceapi.matchDimensions(textCanvas, displaySize);
+  const loadModeModels = useCallback(async (mode) => {
+    modeModelReadyRef.current = false;
 
-    let detections = [];
-
-    detectionInterval.current = setInterval(async () => {
-      try {
-        if (activeMode === "age-gender") {
-          detections = await faceapi
-            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withAgeAndGender();
-        } else {
-          detections = await faceapi
-            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceExpressions();
-        }
-
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        
-        const boxCtx = boxCanvas.getContext('2d');
-        boxCtx.clearRect(0, 0, boxCanvas.width, boxCanvas.height);
-        faceapi.draw.drawDetections(boxCanvas, resizedDetections);
-      } catch (err) {
-        console.error('Detection error:', err);
+    if (mode === "age-gender") {
+      if (!faceapi.nets.ageGenderNet.isLoaded) {
+        await faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL);
       }
-    }, 500); 
+    } else {
+      if (!faceapi.nets.faceExpressionNet.isLoaded) {
+        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+      }
+    }
 
-    textUpdateInterval.current = setInterval(() => {
-      const textCtx = textCanvas.getContext('2d');
-      textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-    
-      detections.forEach((detection, index) => {
-        const { detection: { box } } = detection;
-        let label;
-    
-        if (activeMode === "age-gender") {
-          const { age, gender } = detection;
-          label = `Age: ${Math.round(age)} | Gender: ${gender}`;
-        } else {
-          const { expressions } = detection;
-          const mostLikelyExpression = Object.entries(expressions)
-            .reduce((prev, current) => prev[1] > current[1] ? prev : current);
-          label = `Expression: ${mostLikelyExpression[0]} (${(mostLikelyExpression[1] * 100).toFixed(1)}%)`;
-        }
+    modeModelReadyRef.current = true;
+  }, []);
 
-        const drawBox = new faceapi.draw.DrawBox(box, { 
-          boxColor: '#4287f5',
-          drawLabelOptions: {
-            drawLabel: false 
-          }
-        });
-        drawBox.draw(textCanvas);
+  const setupCanvasToVideo = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = overlayCanvasRef.current;
+    if (!video || !canvas) return;
 
-        const padding = 20;
-        const lineHeight = 30;
-        const yPosition = textCanvas.height - padding - (detections.length - 1 - index) * lineHeight;
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return;
 
-        textCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        textCtx.roundRect(
-          padding, 
-          yPosition - 20, 
-          textCtx.measureText(label).width + 20, 
-          30, 
-          5
-        );
-        textCtx.fill();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(vw * dpr);
+    canvas.height = Math.floor(vh * dpr);
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
 
-        textCtx.font = '16px Inter';
-        textCtx.fillStyle = '#ffffff';
-        textCtx.fillText(label, padding + 10, yPosition);
-      });
-    }, 100);
-  };
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }, []);
 
-  const handleVideoPlay = () => {
-    startDetection();
-  };
+  const startCamera = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
 
-  const handleAcceptPermission = async () => {
-    setShowPermissionDialog(false);
-    localStorage.removeItem('cameraDenied'); // Clear the denied state if user accepts
-    setPermissionDenied(false);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: "user" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
       });
-      
+
+      streamRef.current = stream;
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
       }
-      
+
       setIsLoading(false);
     } catch (err) {
-      setError(err.message);
       setIsLoading(false);
+      setError(err?.message || "Unable to access camera");
     }
+  }, []);
+
+  const drawOverlay = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = overlayCanvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return;
+
+    ctx.clearRect(0, 0, vw, vh);
+
+    const det = latestDetectionRef.current;
+    if (!det) return;
+
+    const { box } = det.detection;
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#4287f5";
+    ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+    const mode = activeModeRef.current;
+
+    let label = "";
+    if (mode === "age-gender") {
+      const age = det.age ? Math.round(det.age) : "-";
+      const gender = det.gender || "-";
+      label = `Age: ${age} | Gender: ${gender}`;
+    } else {
+      const expressions = det.expressions || {};
+      const best = Object.entries(expressions).reduce(
+        (acc, cur) => (cur[1] > acc[1] ? cur : acc),
+        ["neutral", 0]
+      );
+      label = `Expression: ${best[0]} (${(best[1] * 100).toFixed(0)}%)`;
+    }
+
+    ctx.font = "15px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial";
+    const textW = ctx.measureText(label).width;
+
+    const x = Math.max(8, Math.min(box.x, vw - (textW + 20) - 8));
+    const y = Math.max(24, box.y - 10);
+
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    roundRectSafe(ctx, x, y - 20, textW + 20, 24, 6);
+    ctx.fill();
+
+    ctx.fillStyle = "#fff";
+    ctx.fillText(label, x + 10, y - 4);
+  }, []);
+
+  const detectOnce = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || video.readyState < 2) return;
+    if (!modeModelReadyRef.current) return;
+
+    const mode = activeModeRef.current;
+
+    let chain = faceapi
+      .detectSingleFace(video, DETECTOR_OPTIONS)
+      .withFaceLandmarks();
+
+    if (mode === "age-gender") chain = chain.withAgeAndGender();
+    else chain = chain.withFaceExpressions();
+
+    const raw = await chain;
+
+    if (!raw) {
+      latestDetectionRef.current = null;
+      return;
+    }
+
+    const displaySize = { width: video.videoWidth, height: video.videoHeight };
+    latestDetectionRef.current = faceapi.resizeResults(raw, displaySize);
+  }, []);
+
+  const loop = useCallback((t) => {
+    drawOverlay();
+
+    const intervalMs = 1000 / DETECTION_FPS;
+    if (t - lastDetectTimeRef.current > intervalMs) {
+      lastDetectTimeRef.current = t;
+      detectOnce().catch((e) => console.error("Detection error:", e));
+    }
+
+    rafRef.current = requestAnimationFrame(loop);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setIsLoading(true);
+        await loadBaseModels();
+        if (cancelled) return;
+        setModelsReady(true);
+      } catch (e) {
+        if (cancelled) return;
+        setError(e?.message || "Failed to load base models");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadBaseModels]);
+
+  useEffect(() => {
+    if (!modelsReady) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        setIsLoading(true);
+        await loadModeModels(activeMode);
+      } catch (e) {
+        setError(e?.message || "Failed to load mode model");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeMode, loadModeModels, modelsReady]);
+
+  useEffect(() => {
+    if (!modelsReady) return;
+    if (showPermissionDialog || permissionDenied) return;
+
+    startCamera();
+    return () => cleanupAll();
+  }, [modelsReady, showPermissionDialog, permissionDenied, startCamera, cleanupAll]);
+
+  const handleVideoReady = useCallback(() => {
+    setupCanvasToVideo();
+    stopLoop();
+    lastDetectTimeRef.current = 0;
+    rafRef.current = requestAnimationFrame(loop);
+  }, [setupCanvasToVideo, stopLoop, loop]);
+
+  const handleAcceptPermission = () => {
+    setShowPermissionDialog(false);
+    localStorage.removeItem("cameraDenied");
+    setPermissionDenied(false);
+    setError(null);
   };
 
   const handleCancelPermission = () => {
     setShowPermissionDialog(false);
     setPermissionDenied(true);
-    localStorage.setItem('cameraDenied', 'true');
+    localStorage.setItem("cameraDenied", "true");
     setError("Camera permission denied by user");
-    if (videoRef.current?.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-    }
-    if (detectionInterval.current) {
-      clearInterval(detectionInterval.current);
-    }
-    if (textUpdateInterval.current) {
-      clearInterval(textUpdateInterval.current);
-    }
+    cleanupAll();
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setPermissionDenied(false);
+    setShowPermissionDialog(true);
+    localStorage.removeItem("cameraDenied");
+  };
+
+  const switchMode = (mode) => {
+    latestDetectionRef.current = null;
+    setActiveMode(mode);
   };
 
   return (
@@ -230,36 +326,21 @@ const WebcamComponent = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-tertiary p-6 rounded-xl max-w-md m-4">
             <h3 className="text-xl font-bold mb-4 text-white">Camera Permission Required</h3>
-            <div className="space-y-4">
-              <p className="text-white">
-                This face analysis demo needs camera access to:
-              </p>
-              <ul className="list-disc list-inside text-white space-y-2 ml-4">
-                <li>Detect faces in real-time</li>
-                <li>Analyze age and gender characteristics</li>
-                <li>Recognize facial expressions</li>
-              </ul>
-              <div className="bg-white/10 p-4 rounded-lg border border-white/20">
-                <p className="text-sm text-white">
-                  <strong className="text-violet-400 font-bold">Privacy Notice:</strong>{' '}
-                  All processing is done locally in your browser. 
-                  No video data is stored or transmitted to any server.
-                </p>
-              </div>
-              <div className="flex justify-end space-x-4 mt-6">
-                <button 
-                  className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
-                  onClick={handleCancelPermission}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                  onClick={handleAcceptPermission}
-                >
-                  Allow Camera Access
-                </button>
-              </div>
+            <div className="flex justify-end space-x-4 mt-6">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
+                onClick={handleCancelPermission}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                onClick={handleAcceptPermission}
+              >
+                Allow Camera Access
+              </button>
             </div>
           </div>
         </div>
@@ -268,7 +349,9 @@ const WebcamComponent = () => {
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
-          <h2 className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black`}>
+          <h2
+            className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black`}
+          >
             Face Analysis
           </h2>
         </div>
@@ -276,7 +359,8 @@ const WebcamComponent = () => {
         <div className="flex justify-center mb-4">
           <div className="bg-tertiary rounded-lg p-1 inline-flex">
             <button
-              onClick={() => setActiveMode("age-gender")}
+              type="button"
+              onClick={() => switchMode("age-gender")}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 activeMode === "age-gender"
                   ? "bg-primary text-white"
@@ -285,8 +369,10 @@ const WebcamComponent = () => {
             >
               Age & Gender
             </button>
+
             <button
-              onClick={() => setActiveMode("expression")}
+              type="button"
+              onClick={() => switchMode("expression")}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 activeMode === "expression"
                   ? "bg-primary text-white"
@@ -299,26 +385,21 @@ const WebcamComponent = () => {
         </div>
 
         {isLoading && !permissionDenied && (
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+          <div className="flex items-center justify-center py-10">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
           </div>
         )}
 
         {error && (
           <div className="text-center p-4">
-            <div className="text-red-500 mb-4">
-              Error: {error}
-            </div>
+            <div className="text-red-500 mb-4">Error: {error}</div>
             {permissionDenied && (
               <button
-                onClick={() => {
-                  setPermissionDenied(false);
-                  setShowPermissionDialog(true);
-                  localStorage.removeItem('cameraDenied');
-                  setError(null);
-                }}
-                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                type="button"
+                onClick={handleRetry}
+                className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors inline-flex items-center gap-2"
               >
+                <RefreshCw size={18} />
                 Try Again
               </button>
             )}
@@ -331,31 +412,18 @@ const WebcamComponent = () => {
             autoPlay
             playsInline
             muted
-            onPlay={handleVideoPlay}
-            style={{
-              width: '100%',
-              height: 'auto'
-            }}
-            className="rounded-lg"
+            onLoadedMetadata={handleVideoReady}
+            className="rounded-lg w-full h-auto"
           />
           <canvas
-            ref={boxCanvasRef}
+            ref={overlayCanvasRef}
             style={{
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               left: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
-          <canvas
-            ref={textCanvasRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
             }}
           />
         </div>
@@ -363,9 +431,9 @@ const WebcamComponent = () => {
         <div className="mt-4 text-center">
           <p className="text-secondary text-[14px]">
             <Camera className="inline mr-2" />
-            {activeMode === "age-gender" 
-              ? "Point your camera at faces to estimate age and gender"
-              : "Point your camera at faces to detect expressions"}
+            {activeMode === "age-gender"
+              ? "Point your camera at a single face to estimate age and gender"
+              : "Point your camera at a single face to detect expressions"}
           </p>
         </div>
       </div>
