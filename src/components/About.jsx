@@ -56,25 +56,11 @@ const About = () => {
           }`}
         >
           <p>
-            Hello! I'm Jared Lee, a FinTech professional with a distinctive combination of
-            financial acumen and software engineering expertise. My technical stack includes
-            Python, Java, TypeScript, SQL, and various modern frameworks like React, Angular,
-            and Spring Boot, supported by strong DevOps practices using Git, Jenkins.
-          </p>
-
-          <p className="mt-4">
-            My educational foundation combines a Bachelor of Commerce in Accounting and Corporate
-            Finance from the University of Adelaide with Software Engineering training from
-            General Assembly. I've further enhanced my expertise with Google Cybersecurity and
-            IBM Data Science Professional certifications.
-          </p>
-
-          <p className="mt-4">
-            I'm particularly passionate about bridging the gap between business and technology,
-            having demonstrated this through projects like implementing enterprise-scale ETL
-            pipelines and developing AI-based text-to-SQL models. Beyond my professional work,
-            I'm an Advanced Open Water Diver, active volunteer with NCSF Uplift, and enthusiast
-            in dance and photography.
+            Hello! I’m Jared Lee, a FinTech professional who combines financial expertise with software engineering skills across 
+            Python, Java, TypeScript, SQL, and frameworks like React, Angular, and Spring Boot, backed by DevOps practices (Git, Jenkins). 
+            I hold a Bachelor of Commerce in Accounting and Corporate Finance from the University of Adelaide and software engineering 
+            training from General Assembly, with additional Google Cybersecurity and IBM Data Science certifications. 
+            I enjoy bridging business and technology through work like enterprise ETL pipelines and text-to-SQL models.
           </p>
 
           <p className="mt-4">
@@ -85,7 +71,7 @@ const About = () => {
             >
               jared.lee.zhen.yan@gmail.com
             </a>
-            . I'm always open to new opportunities and collaborations!
+              I'm always open to new opportunities and collaborations!
           </p>
         </div>
 
