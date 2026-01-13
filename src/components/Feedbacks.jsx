@@ -378,44 +378,58 @@ const WebcamComponent = () => {
             }}
           />
 
-          {showOverlay && (
-            <div className="absolute inset-0 rounded-lg bg-black/60 flex items-center justify-center">
-              <div className="text-center px-6">
-                <div className="text-white font-semibold text-lg mb-2">
-                  {error ? "Camera not available" : isLoading ? "Starting..." : "Enable your camera to begin"}
+        {/* OVERLAY (mobile-friendly) */}
+        {showOverlay && (
+          <div className="absolute inset-0 rounded-lg bg-black/60 flex items-center justify-center p-4 sm:p-6">
+            <div className="w-full max-w-sm sm:max-w-md text-center">
+              {/* Title: wraps nicely, responsive sizing */}
+              <div className="text-white font-semibold text-base sm:text-lg leading-snug mb-2 break-words">
+                {error
+                  ? "Camera not available"
+                  : isLoading
+                  ? "Starting..."
+                  : "Enable your camera to begin"}
+              </div>
+
+              {/* Disclaimer: smaller on mobile, comfortable line-height */}
+              <div className="text-white/70 text-xs sm:text-sm leading-relaxed mx-auto mb-5 sm:mb-6">
+                Your camera feed is processed in real-time in your browser only. We don’t record, store, or
+                upload any video or face data.
+              </div>
+
+              {/* Error: keep it readable and not too wide */}
+              {error && (
+                <div className="text-red-300 text-xs sm:text-sm mb-4 break-words">
+                  {error}
                 </div>
+              )}
 
-                <div className="text-white/70 text-sm leading-relaxed max-w-md mx-auto mb-6">
-                  Your camera feed is processed in real-time in your browser only. We don’t record, store, or upload any video or face data.
-                </div>
+              {/* Buttons: stack on mobile, row on larger screens */}
+              {!isLoading && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleEnableCamera}
+                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                  >
+                    Enable Camera
+                  </button>
 
-                {error && <div className="text-red-300 text-sm mb-4">{error}</div>}
-
-                {!isLoading && (
-                  <div className="flex items-center justify-center gap-3">
+                  {permissionDenied && (
                     <button
                       type="button"
-                      onClick={handleEnableCamera}
-                      className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                      onClick={handleRetry}
+                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
                     >
-                      Enable Camera
+                      <RefreshCw size={18} />
+                      Try Again
                     </button>
-
-                    {permissionDenied && (
-                      <button
-                        type="button"
-                        onClick={handleRetry}
-                        className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center gap-2"
-                      >
-                        <RefreshCw size={18} />
-                        Try Again
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
         </div>
 
         <div className="mt-4 text-center">
