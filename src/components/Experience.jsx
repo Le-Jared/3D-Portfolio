@@ -1,11 +1,13 @@
 import React from "react";
-import {VerticalTimeline, VerticalTimelineElement} from "react-vertical-timeline-component";
-import { motion } from "framer-motion";
+import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { styles } from "../styles";
 import { experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
-import { textVariant } from "../utils/motion";
+import { useInViewOnce } from "../hooks/useInViewOnce";
 
 const ExperienceCard = ({ experience }) => {
   return (
@@ -29,10 +31,7 @@ const ExperienceCard = ({ experience }) => {
     >
       <div>
         <h3 className="text-white text-[24px] font-bold">{experience.title}</h3>
-        <p
-          className="text-secondary text-[16px] font-semibold"
-          style={{ margin: 0 }}
-        >
+        <p className="text-secondary text-[16px] font-semibold" style={{ margin: 0 }}>
           {experience.company_name}
         </p>
       </div>
@@ -52,26 +51,30 @@ const ExperienceCard = ({ experience }) => {
 };
 
 const Experience = () => {
+  const [titleRef, titleInView] = useInViewOnce({ threshold: 0.2 });
+
   return (
     <>
-      <motion.div variants={textVariant()}>
+      {/* Replaces <motion.div variants={textVariant()}> */}
+      <div
+        ref={titleRef}
+        className={`reveal ${titleInView ? "is-visible" : ""}`}
+      >
         <p className={`${styles.sectionSubText} text-center`}>
           What I have done so far
         </p>
+
         <h2
           className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black text-center`}
         >
           Experience.
         </h2>
-      </motion.div>
+      </div>
 
       <div className="mt-20 flex flex-col">
         <VerticalTimeline>
           {experiences.map((experience, index) => (
-            <ExperienceCard
-              key={`experience-${index}`}
-              experience={experience}
-            />
+            <ExperienceCard key={`experience-${index}`} experience={experience} />
           ))}
         </VerticalTimeline>
       </div>

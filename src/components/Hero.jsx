@@ -16,12 +16,12 @@ const Hero = () => {
   const [text, count] = useTypewriter({
     words: [
       "<FinTechInnovator />",
-      "DataEngineer & ConsultantDev",
+      "Management Consultant",
       "AdvancedDiver",
       "AIEnthusiast & MLBuilder",
-      "BusinessTechBridger",
-      "VolunteerCoder",
-      "3DModelingExplorer"
+      "OpenSourceFinancier",
+      "Finance-Tech Translator",
+      "Financial Data Whisperer",
     ],
     loop: true,
     delaySpeed: 1000,

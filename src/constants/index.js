@@ -33,7 +33,9 @@ import {
   Deal,
   Exec,
   EventHub,
+  Agender,
   csharp,
+  WebScrapper,
 
 } from "../assets";
 export const navLinks = [
@@ -196,9 +198,28 @@ const experiences = [
     iconBg: "#E6DEDD",
     date: "2021 - 2022",
     points: [
+<<<<<<< HEAD
       "Valuations: Engineered complex financial models (DCF, LBO, Market Multiples) for M&A transactions, contributing to $500M+ in deal value",
       "Business Restructuring Services: Orchestrated assessments of underperforming business units, implementing optimization strategies that drove productivity gains and cost savings",
       "Operations: Led IT transformation initiatives that drove 15% operational efficiency boost for Philippines-based logistics company",
+=======
+      "Championed an AI-based text-to-SQL model, accelerating financial data analysis and democratizing data access",
+      "Engineered full-stack market sentiment platform using Python/Flask API backend and Angular dashboard, integrating data mining algorithms for real-time trading insights",
+      "Designed and implemented enterprise-scale ETL pipelines and data warehouse architecture for real-time financial market data, reducing processing time by 20% and enabling seamless market intelligence workflows",
+      "Automated end-to-end dashboard testing using Selenium WebDriver with Java/Spring Boot framework, achieving 99.9% test coverage across critical UI functionalities and user workflows",
+    ],
+  },
+  {
+    title: "Manager, Valuation Control (Developer)",
+    company_name: "Standard Chartered Bank",
+    icon: code1,
+    iconBg: "#E6DEDD",
+    date: "2025",
+    points: [
+      "Spearhead the design and implementation of quantitative validation tools for complex financial instruments, collaborating with trading desks to enhance valuation methodologies and control processes",
+      "Develop and maintain sophisticated Python-based valuation models and automated frameworks for independent price verification (IPV) and fair value adjustments, ensuring robust risk control and regulatory compliance",
+      "Architected and implemented CI/CD pipeline in Azure DevOps for automated deployment of Django applications, enhancing deployment efficiency and reliability",
+>>>>>>> 735997f4e99ff1252cf33d402af8db7af41bc537
     ],
   },
 ];
@@ -210,20 +231,29 @@ const projects = [
       "StreamHub is a communication platform that uses Kafka for real-time messaging, offering secure access like Teleport, live chat with emoji reactions, and speech-to-text functionality for distributed team collaboration.",
     tags: [
       {
-        name: "React",
-        color: "pink-text-gradient",
-      },
-      {
-        name: "SpringBoot",
-        color: "green-text-gradient",
-      },
-      {
-        name: "PostgreSQL",
+        name: "Python",
         color: "blue-text-gradient",
       },
     ],
     image: Streamhub,
     source_code_link: "https://github.com/Le-Jared/streamhub-frontend",
+  },
+  {
+    name: "Stealth Selenium Scrapper",
+    description:
+      "A Python-based web scraping framework using Selenium with advanced anti-detection features",
+    tags: [
+      {
+        name: "Python",
+        color: "blue-text-gradient",
+      },
+      {
+        name: "Selenium",
+        color: "silver-text-gradient",
+      },
+    ],
+    image: WebScrapper,
+    source_code_link: "https://github.com/Le-Jared/stealth-selenium-scrapper",
   },
   {
     name: "Banking Application",
@@ -363,6 +393,19 @@ const projects = [
     ],
     image: huddle,
     source_code_link: "https://github.com/Le-Jared/The-Huddle-CRM",
+  },
+  {
+    name: "Face Recognition",
+    description:
+      "Web application that performs real-time webcam & video face tracking as well as detect and identify faces from images with the help of pre-trained models",
+    tags: [
+      {
+        name: "React",
+        color: "pink-text-gradient",
+      },
+    ],
+    image: Agender,
+    source_code_link: "https://github.com/Le-Jared/3D-Portfolio",
   },
 ];
 

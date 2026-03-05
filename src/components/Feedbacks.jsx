@@ -1,350 +1,476 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import * as faceapi from "face-api.js";
+import { Camera, RefreshCw } from "lucide-react";
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
-import { fadeIn } from "../utils/motion";
-import * as faceapi from 'face-api.js';
-import { Camera } from 'lucide-react';
 
-const CameraPermissionBox = ({ onAccept }) => (
-  <div className="bg-tertiary/50 p-6 rounded-xl max-w-md mx-auto mb-6">
-    <div className="space-y-4">
-      <p className="text-white text-center text-lg font-semibold mb-3">
-        Camera Access Required
-      </p>
-      <ul className="list-disc list-inside text-white space-y-2 ml-4">
-        <li>Detect faces in real-time</li>
-        <li>Analyze age and gender characteristics</li>
-        <li>Recognize facial expressions</li>
-      </ul>
-      <div className="bg-white/10 p-4 rounded-lg border border-white/20 mt-4">
-        <p className="text-sm text-white">
-          <strong className="text-violet-400 font-bold">Privacy Notice:</strong>{' '}
-          All processing is done locally in your browser. 
-          No video data is stored or transmitted to any server.
-        </p>
-      </div>
-      <div className="flex justify-center mt-4">
-        <button 
-          className="px-6 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-          onClick={onAccept}
-        >
-          Enable Camera
-        </button>
-      </div>
-    </div>
-  </div>
-);
+const MODEL_URL = `${import.meta.env.BASE_URL}models/`;
+
+const DETECTION_FPS = 10;
+const DETECTOR_OPTIONS = new faceapi.TinyFaceDetectorOptions({
+  inputSize: 224,
+  scoreThreshold: 0.5,
+});
+
+function roundRectSafe(ctx, x, y, w, h, r = 8) {
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+    return;
+  }
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+}
 
 const WebcamComponent = () => {
   const videoRef = useRef(null);
-  const boxCanvasRef = useRef(null);
-  const textCanvasRef = useRef(null);
+  const overlayCanvasRef = useRef(null);
+
+  const rafRef = useRef(null);
+  const lastDetectTimeRef = useRef(0);
+
+  const latestDetectionRef = useRef(null);
+  const modeModelReadyRef = useRef(false);
+  const streamRef = useRef(null);
+
   const [isLoading, setIsLoading] = useState(true);
+  const [modelsReady, setModelsReady] = useState(false);
   const [error, setError] = useState(null);
+
   const [activeMode, setActiveMode] = useState("age-gender");
-  const detectionInterval = useRef(null);
-  const textUpdateInterval = useRef(null);
+  const activeModeRef = useRef(activeMode);
+
   const [permissionDenied, setPermissionDenied] = useState(
-    localStorage.getItem('cameraDenied') === 'true'
+    localStorage.getItem("cameraDenied") === "true"
+  );
+
+  const [cameraStarted, setCameraStarted] = useState(false);
+
+  useEffect(() => {
+    activeModeRef.current = activeMode;
+  }, [activeMode]);
+
+  const stopStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setCameraStarted(false);
+  }, []);
+
+  const stopLoop = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+  }, []);
+
+  const cleanupAll = useCallback(() => {
+    stopLoop();
+    stopStream();
+    latestDetectionRef.current = null;
+  }, [stopLoop, stopStream]);
+
+  const loadBaseModels = useCallback(async () => {
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+    ]);
+  }, []);
+
+  const loadModeModels = useCallback(async (mode) => {
+    modeModelReadyRef.current = false;
+
+    if (mode === "age-gender") {
+      if (!faceapi.nets.ageGenderNet.isLoaded) {
+        await faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL);
+      }
+    } else {
+      if (!faceapi.nets.faceExpressionNet.isLoaded) {
+        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+      }
+    }
+
+    modeModelReadyRef.current = true;
+  }, []);
+
+  const setupCanvasToVideo = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = overlayCanvasRef.current;
+    if (!video || !canvas) return;
+
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(vw * dpr);
+    canvas.height = Math.floor(vh * dpr);
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+
+    if (!window.isSecureContext) {
+      setIsLoading(false);
+      setError("Camera requires HTTPS (secure context).");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: "user" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
+      }
+
+      setCameraStarted(true);
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      setPermissionDenied(true);
+      localStorage.setItem("cameraDenied", "true");
+      setError(err?.message || "Unable to access camera");
+    }
+  }, []);
+
+  const drawOverlay = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = overlayCanvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return;
+
+    ctx.clearRect(0, 0, vw, vh);
+
+    const det = latestDetectionRef.current;
+    if (!det) return;
+
+    const { box } = det.detection;
+
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#60a5fa"; // light blue
+    ctx.shadowColor = "rgba(96,165,250,0.45)";
+    ctx.shadowBlur = 10;
+    ctx.strokeRect(box.x, box.y, box.width, box.height);
+    ctx.restore();
+
+    const mode = activeModeRef.current;
+
+    let label = "";
+    if (mode === "age-gender") {
+      const age = det.age ? Math.round(det.age) : "-";
+      const gender = det.gender || "-";
+      label = `Age: ${age}  •  Gender: ${gender}`;
+    } else {
+      const expressions = det.expressions || {};
+      const best = Object.entries(expressions).reduce(
+        (acc, cur) => (cur[1] > acc[1] ? cur : acc),
+        ["neutral", 0]
+      );
+      label = `Expression: ${best[0]} (${(best[1] * 100).toFixed(0)}%)`;
+    }
+
+    const fontSize = Math.max(14, Math.min(20, Math.round(vw / 28)));
+    ctx.font = `600 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial`;
+    ctx.textBaseline = "alphabetic";
+
+    const padX = 10;
+    const padY = 7;
+    const textW = ctx.measureText(label).width;
+    const boxW = textW + padX * 2;
+    const boxH = fontSize + padY * 2;
+    const x = Math.max(8, Math.min(box.x, vw - boxW - 8));
+    const yTop = box.y - boxH - 8;
+    const y = yTop >= 8 ? yTop : Math.max(8, box.y + 8);
+
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.78)";
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 1;
+    ctx.shadowColor = "rgba(0,0,0,0.45)";
+    ctx.shadowBlur = 8;
+
+    roundRectSafe(ctx, x, y, boxW, boxH, 10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(0,0,0,0.75)";
+    ctx.strokeText(label, x + padX, y + boxH - padY);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(label, x + padX, y + boxH - padY);
+    ctx.restore();
+  }, []);
+
+  const detectOnce = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || video.readyState < 2) return;
+    if (!modeModelReadyRef.current) return;
+
+    const mode = activeModeRef.current;
+
+    let chain = faceapi
+      .detectSingleFace(video, DETECTOR_OPTIONS)
+      .withFaceLandmarks();
+
+    if (mode === "age-gender") chain = chain.withAgeAndGender();
+    else chain = chain.withFaceExpressions();
+
+    const raw = await chain;
+
+    if (!raw) {
+      latestDetectionRef.current = null;
+      return;
+    }
+
+    const displaySize = { width: video.videoWidth, height: video.videoHeight };
+    latestDetectionRef.current = faceapi.resizeResults(raw, displaySize);
+  }, []);
+
+  const loop = useCallback(
+    (t) => {
+      drawOverlay();
+
+      const intervalMs = 1000 / DETECTION_FPS;
+      if (t - lastDetectTimeRef.current > intervalMs) {
+        lastDetectTimeRef.current = t;
+        detectOnce().catch(() => {});
+      }
+
+      rafRef.current = requestAnimationFrame(loop);
+    },
+    [drawOverlay, detectOnce]
   );
 
   useEffect(() => {
-    const loadModels = async () => {
+    let cancelled = false;
+    (async () => {
       try {
         setIsLoading(true);
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-          faceapi.nets.faceExpressionNet.loadFromUri('/models'),
-          faceapi.nets.ageGenderNet.loadFromUri('/models')
-        ]);
-        
-        if (permissionDenied) {
-          return;
-        }
-        
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { 
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            facingMode: 'user'
-          } 
-        });
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-        
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
+        await loadBaseModels();
+        if (cancelled) return;
+        setModelsReady(true);
+      } catch (e) {
+        if (cancelled) return;
+        setError(e?.message || "Failed to load base models");
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    };
-
-    loadModels();
-
+    })();
     return () => {
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      }
-      if (detectionInterval.current) {
-        clearInterval(detectionInterval.current);
-      }
-      if (textUpdateInterval.current) {
-        clearInterval(textUpdateInterval.current);
-      }
+      cancelled = true;
     };
-  }, [permissionDenied]);
+  }, [loadBaseModels]);
 
   useEffect(() => {
-    if (videoRef.current && videoRef.current.readyState === 4) {
-      if (detectionInterval.current) {
-        clearInterval(detectionInterval.current);
-      }
-      if (textUpdateInterval.current) {
-        clearInterval(textUpdateInterval.current);
-      }
-      startDetection();
-    }
-  }, [activeMode]);
+    if (!modelsReady) return;
 
-  const startDetection = () => {
-    const video = videoRef.current;
-    const boxCanvas = boxCanvasRef.current;
-    const textCanvas = textCanvasRef.current;
-
-    if (!video || !boxCanvas || !textCanvas) return;
-
-    boxCanvas.width = video.videoWidth;
-    boxCanvas.height = video.videoHeight;
-    textCanvas.width = video.videoWidth;
-    textCanvas.height = video.videoHeight;
-
-    const displaySize = {
-      width: video.videoWidth,
-      height: video.videoHeight
-    };
-
-    faceapi.matchDimensions(boxCanvas, displaySize);
-    faceapi.matchDimensions(textCanvas, displaySize);
-
-    let detections = [];
-
-    detectionInterval.current = setInterval(async () => {
+    let cancelled = false;
+    (async () => {
       try {
-        if (activeMode === "age-gender") {
-          detections = await faceapi
-            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withAgeAndGender();
-        } else {
-          detections = await faceapi
-            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceExpressions();
-        }
-
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        
-        const boxCtx = boxCanvas.getContext('2d');
-        boxCtx.clearRect(0, 0, boxCanvas.width, boxCanvas.height);
-        faceapi.draw.drawDetections(boxCanvas, resizedDetections);
-      } catch (err) {
-        console.error('Detection error:', err);
+        setIsLoading(true);
+        await loadModeModels(activeMode);
+      } catch (e) {
+        setError(e?.message || "Failed to load mode model");
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    }, 500);
+    })();
 
-    textUpdateInterval.current = setInterval(() => {
-      const textCtx = textCanvas.getContext('2d');
-      textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-    
-      detections.forEach((detection, index) => {
-        const { detection: { box } } = detection;
-        let label;
-    
-        if (activeMode === "age-gender") {
-          const { age, gender } = detection;
-          label = `Age: ${Math.round(age)} | Gender: ${gender}`;
-        } else {
-          const { expressions } = detection;
-          const mostLikelyExpression = Object.entries(expressions)
-            .reduce((prev, current) => prev[1] > current[1] ? prev : current);
-          label = `Expression: ${mostLikelyExpression[0]} (${(mostLikelyExpression[1] * 100).toFixed(1)}%)`;
-        }
+    return () => {
+      cancelled = true;
+    };
+  }, [activeMode, loadModeModels, modelsReady]);
 
-        const drawBox = new faceapi.draw.DrawBox(box, { 
-          boxColor: '#4287f5',
-          drawLabelOptions: {
-            drawLabel: false 
-          }
-        });
-        drawBox.draw(textCanvas);
+  useEffect(() => {
+    return () => cleanupAll();
+  }, [cleanupAll]);
 
-        const padding = 20;
-        const lineHeight = 30;
-        const yPosition = textCanvas.height - padding - (detections.length - 1 - index) * lineHeight;
+  const handleVideoReady = useCallback(() => {
+    setupCanvasToVideo();
+    stopLoop();
+    lastDetectTimeRef.current = 0;
+    rafRef.current = requestAnimationFrame(loop);
+  }, [setupCanvasToVideo, stopLoop, loop]);
 
-        textCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        textCtx.roundRect(
-          padding, 
-          yPosition - 20, 
-          textCtx.measureText(label).width + 20, 
-          30, 
-          5
-        );
-        textCtx.fill();
-
-        textCtx.font = '16px Inter';
-        textCtx.fillStyle = '#ffffff';
-        textCtx.fillText(label, padding + 10, yPosition);
-      });
-    }, 100);
-  };
-
-  const handleVideoPlay = () => {
-    startDetection();
-  };
-
-  const handleAcceptPermission = async () => {
-    localStorage.removeItem('cameraDenied');
+  const handleEnableCamera = async () => {
+    localStorage.removeItem("cameraDenied");
     setPermissionDenied(false);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        } 
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      
-      setIsLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setIsLoading(false);
-    }
+    setError(null);
+    await startCamera();
   };
+
+  const handleRetry = () => {
+    localStorage.removeItem("cameraDenied");
+    setPermissionDenied(false);
+    setError(null);
+  };
+
+  const switchMode = (mode) => {
+    latestDetectionRef.current = null;
+    setActiveMode(mode);
+  };
+
+  const showOverlay = !cameraStarted || isLoading || error;
 
   return (
-    <motion.div
-      variants={fadeIn("up", "spring", 0.5, 0.75)}
-      className="bg-black-200 p-5 rounded-3xl w-full"
-    >
+    <div className="bg-black-200 p-5 rounded-3xl w-full">
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}>
         <div className="text-center mb-4">
           <p className={styles.sectionSubText}>Real-time Detection</p>
-          <h2 className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black`}>
+          <h2
+            className={`${styles.sectionHeadText} animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-black`}
+          >
             Face Analysis
           </h2>
         </div>
 
-        {permissionDenied ? (
-          <CameraPermissionBox onAccept={handleAcceptPermission} />
-        ) : (
-          <>
-            <div className="flex justify-center mb-4">
-              <div className="bg-tertiary rounded-lg p-1 inline-flex">
-                <button
-                  onClick={() => setActiveMode("age-gender")}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    activeMode === "age-gender"
-                      ? "bg-primary text-white"
-                      : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  Age & Gender
-                </button>
-                <button
-                  onClick={() => setActiveMode("expression")}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    activeMode === "expression"
-                      ? "bg-primary text-white"
-                      : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  Expression
-                </button>
-              </div>
-            </div>
+        <div className="flex justify-center mb-4">
+          <div className="bg-tertiary rounded-lg p-1 inline-flex">
+            <button
+              type="button"
+              onClick={() => switchMode("age-gender")}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeMode === "age-gender"
+                  ? "bg-primary text-white"
+                  : "text-white/70 hover:text-white"
+              }`}
+            >
+              Age & Gender
+            </button>
 
-            {isLoading && (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => switchMode("expression")}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeMode === "expression"
+                  ? "bg-primary text-white"
+                  : "text-white/70 hover:text-white"
+              }`}
+            >
+              Expression
+            </button>
+          </div>
+        </div>
 
-            {error && (
-              <div className="text-center p-4">
-                <div className="text-red-500 mb-4">
-                  Error: {error}
+        {/* VIDEO AREA */}
+        <div className="w-full mx-auto sm:max-w-[640px]">
+          <div className="relative w-full aspect-[3/4] sm:aspect-video rounded-lg overflow-hidden bg-black/20">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              onLoadedMetadata={handleVideoReady}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+
+            <canvas
+              ref={overlayCanvasRef}
+              className="absolute inset-0 w-full h-full pointer-events-none"
+            />
+
+            {showOverlay && (
+              <div className="absolute inset-0 bg-black/60 p-3 sm:p-6">
+                <div className="h-full w-full flex items-center justify-center">
+                  {/* Card fills available height; internal content can scroll */}
+                  <div className="w-full max-w-[22rem] sm:max-w-md h-full rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 shadow-lg overflow-hidden flex flex-col">
+                    {/* Scroll area (feedback box is auto-height inside this) */}
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+                      <div className="text-white font-semibold text-base sm:text-lg leading-snug text-center">
+                        {error ? (
+                          "Camera not available"
+                        ) : isLoading ? (
+                          "Starting..."
+                        ) : (
+                          <>
+                            <span className="block">Enable your camera</span>
+                            <span className="block">to begin</span>
+                          </>
+                        )}
+                      </div>
+
+                      {/* AUTO-HEIGHT feedback box (no min/max height) */}
+                      <div className="mt-4 rounded-lg bg-white/5 border border-white/10 p-4 sm:p-5 text-white/80 text-xs sm:text-sm leading-relaxed">
+                        Your camera feed is processed in real-time in your browser only. We don’t
+                        record, store, or upload any video or face data.
+                      </div>
+
+                      {error && (
+                        <div className="mt-3 text-red-300 text-xs sm:text-sm break-words text-center">
+                          {error}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer always visible */}
+                    {!isLoading && (
+                      <div className="p-4 sm:p-5 pt-0 bg-black/30 border-t border-white/10">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
+                            type="button"
+                            onClick={handleEnableCamera}
+                            className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                          >
+                            Enable Camera
+                          </button>
+
+                          {permissionDenied && (
+                            <button
+                              type="button"
+                              onClick={handleRetry}
+                              className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
+                            >
+                              <RefreshCw size={18} />
+                              Try Again
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setPermissionDenied(false);
-                    localStorage.removeItem('cameraDenied');
-                    setError(null);
-                    handleAcceptPermission();
-                  }}
-                  className="px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                >
-                  Try Again
-                </button>
               </div>
             )}
+          </div>
+        </div>
 
-            <div className="relative w-full max-w-[640px] mx-auto">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                onPlay={handleVideoPlay}
-                style={{
-                  width: '100%',
-                  height: 'auto'
-                }}
-                className="rounded-lg"
-              />
-              <canvas
-                ref={boxCanvasRef}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%'
-                }}
-              />
-              <canvas
-                ref={textCanvasRef}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%'
-                }}
-              />
-            </div>
-
-            <div className="mt-4 text-center">
-              <p className="text-secondary text-[14px]">
-                <Camera className="inline mr-2" />
-                {activeMode === "age-gender" 
-                  ? "Point your camera at faces to estimate age and gender"
-                  : "Point your camera at faces to detect expressions"}
-              </p>
-            </div>
-          </>
-        )}
+        {/* Smaller on mobile */}
+        <div className="mt-4 text-center">
+          <p className="text-secondary text-[11px] sm:text-[12px] leading-snug">
+            <Camera className="inline mr-2" />
+            {activeMode === "age-gender"
+              ? "Point your camera at a single face to estimate age and gender"
+              : "Point your camera at a single face to detect expressions"}
+          </p>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
