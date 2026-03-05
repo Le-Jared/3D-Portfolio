@@ -57,11 +57,11 @@ const services = [
     icon: consultant,
   },
   {
-    title: "Business Analyst",
+    title: "Technical Product Manager",
     icon: data_analyst,
   },
   {
-    title: "Data Scientist",
+    title: "Business Analyst",
     icon: engineer,
   },
   {
@@ -155,15 +155,27 @@ const technologies = [
 
 const experiences = [
   {
-    title: "Deals Advisory Associate",
-    company_name: "PwC",
-    icon: Deal,
+    title: "Manager, VC Technology",
+    company_name: "Standard Chartered Bank",
+    icon: Exec, 
     iconBg: "#E6DEDD",
-    date: "2021",
+    date: "2025 - Present",
     points: [
-      "Valuations: Engineered complex financial models (DCF, LBO, Market Multiples) for M&A transactions, driving $500M+ in deal value ",
-      "Business Restructuring Services: Executed impactful restructuring initiatives and debt advisory services, significantly enhancing productivity and cost savings",
-      "Operations: Engineered and implemented automation initiatives for a Philippines-based logistics company, boosting operational efficiency by 15%",
+      "Led valuation methodology analyses and control frameworks, aligning independent price verification with regulatory requirements to strengthen financial controls and reporting accuracy",
+      "Architected valuation frameworks and reserve calculation models using Power BI and Excel, driving 20% operational efficiency improvement through streamlined control processes",
+    ],
+  },
+  {
+    title: "Software Engineer",
+    company_name: "DBS Bank",
+    icon: code1,
+    iconBg: "#E6DEDD",
+    date: "2022 - 2023",
+    points: [
+      "Championed AI-based text-to-SQL model adoption, defining product requirements to democratize data access and accelerate financial analysis across business units",
+      "Owned end-to-end design and delivery of enterprise ETL pipelines for real-time market data, reducing processing time by 20%",
+      "Engineered market sentiment prediction model using data mining algorithms and Angular dashboard visualization, delivering real-time trend forecasting with exceptional accuracy",
+      "Developed Java/Spring Boot microservice for automated infrastructure request management, streamlining regulatory compliance processes and maintaining 99.9% system availability",
     ],
   },
   {
@@ -171,34 +183,22 @@ const experiences = [
     company_name: "Argile Partners",
     icon: consultant,
     iconBg: "#E6DEDD",
-    date: "2023",
+    date: "2022 - 2023",
     points: [
-      "Developed sophisticated financial models and valuation analyses, identifying cost optimization strategies that reduced operational expenses by 20% and significantly enhanced business performance for target companies",
-      "Led vital restructuring analyses and cash flow optimization strategies that extended startup runway during challenging markets",
+      "Developed financial models and valuation analyses using Power BI and Excel, delivering cost optimization strategies that reduced operational expenses by 20%",
+      "Drove restructuring analyses and cash flow optimization roadmaps, aligning stakeholder priorities to extend startup runway during challenging markets",
     ],
   },
   {
-    title: "Software Engineer",
-    company_name: "DBS",
-    icon: code1,
+    title: "Deals Advisory Associate",
+    company_name: "PwC",
+    icon: Deal,
     iconBg: "#E6DEDD",
-    date: "2024",
+    date: "2021 - 2022",
     points: [
-      "Championed an AI-based text-to-SQL model, accelerating financial data analysis and democratizing data access",
-      "Engineered market sentiment prediction model using data mining algorithms and Angular dashboard visualization, delivering real-time trend forecasting with exceptional accuracy and significantly enhancing trading strategy performance",
-      "Designed and implemented enterprise-scale ETL pipelines and data warehouse architecture for real-time financial market data, reducing processing time by 20% and enabling seamless market intelligence workflows",
-      "Developed Java/Spring Boot microservice for automated infrastructure request management, streamlining regulatory compliance processes and maintaining 99.9% system availability",
-    ],
-  },
-  {
-    title: "Business Analyst",
-    company_name: "DBS",
-    icon: Exec,
-    iconBg: "#E6DEDD",
-    date: "2024",
-    points: [
-      "Bridged communication between business stakeholders and engineering teams, effectively translating complex business requirements into technical specifications and system architectures",
-      "Spearheaded the development and implementation of automated reporting solutions using Python, reducing manual processing time by 70% and improving data accuracy across multiple business units",
+      "Valuations: Engineered complex financial models (DCF, LBO, Market Multiples) for M&A transactions, contributing to $500M+ in deal value",
+      "Business Restructuring Services: Orchestrated assessments of underperforming business units, implementing optimization strategies that drove productivity gains and cost savings",
+      "Operations: Led IT transformation initiatives that drove 15% operational efficiency boost for Philippines-based logistics company",
     ],
   },
 ];

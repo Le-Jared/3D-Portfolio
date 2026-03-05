@@ -47,37 +47,42 @@ const About = () => {
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        {/* Introduction */}
-        Hello! I'm Jared Lee, a Technical Consultant with a distinctive combination of financial 
-        acumen and software engineering expertise. My technical stack includes Python, Java, 
-        TypeScript, SQL, and various modern frameworks like React, Angular, and Spring Boot, 
-        supported by strong DevOps practices using Git, Jenkins.
-        
-        {/* Current Role */}
-        <div className="mt-4">
-          Currently at DBS Bank through FDM Group, I serve dual roles as a Software Engineer 
-          and Business Analyst, where I've successfully developed AI-based solutions and 
-          automated reporting tools. My previous experience includes positions at Argile 
-          Partners as a Management Consultant and PwC as a Deals Advisory Associate, where 
-          I specialized in financial modeling, business restructuring, and operational optimization.
-        </div>
+      {/* Introduction */}
+      Hello! I'm Jared Lee, a Product-focused Technical Leader combining financial expertise, 
+      software engineering, and end-to-end product delivery. I specialize in translating business 
+      requirements into scalable solutions, managing cross-functional teams, and driving product 
+      roadmaps from concept to deployment using Agile methodologies, with technical proficiency 
+      in Python, Java, TypeScript, React, Angular, and Spring Boot.
 
-        {/* Education & Certifications */}
-        <div className="mt-4">
-          My educational foundation combines a Bachelor of Commerce in Accounting and Corporate 
-          Finance from the University of Adelaide with intensive Software Engineering training 
-          from General Assembly. I've further enhanced my expertise with Google Cybersecurity 
-          and IBM Data Science Professional certifications.
-        </div>
+      {/* Current Role */}
+      <div className="mt-4">
+        Currently serving as Manager, VC Technology at Standard Chartered Bank, I lead valuation 
+        control initiatives, architecting data-driven frameworks and managing stakeholder alignment 
+        across regulatory and business priorities. Previously at DBS Bank, I championed AI product 
+        adoption, owned end-to-end ETL pipeline delivery, and bridged engineering and business teams 
+        as a Product-minded engineer. My consulting background at Argile Partners and PwC equipped 
+        me with deep expertise in financial modeling, restructuring advisory, and operational 
+        transformation—skills I leverage to drive product strategy and business outcomes.
+      </div>
 
-        {/* Professional Interests & Projects */}
-        <div className="mt-4">
-          I'm particularly passionate about bridging the gap between business and technology, 
-          having demonstrated this through projects like implementing enterprise-scale ETL 
-          pipelines and developing AI-based text-to-SQL models. Beyond my professional work, 
-          I'm an Advanced Open Water Diver, active volunteer with NCSF Uplift, and enthusiast 
-          in dance and photography.
-        </div>
+      {/* Education & Certifications */}
+      <div className="mt-4">
+        My educational foundation combines a Bachelor of Commerce in Accounting and Corporate 
+        Finance from the University of Adelaide with intensive Software Engineering training 
+        from General Assembly. I've further enhanced my product and technical expertise with 
+        Google Cybersecurity and IBM Data Science Professional certifications, complemented 
+        by hands-on experience with JIRA, Confluence, and Agile delivery frameworks.
+      </div>
+
+      {/* Professional Interests & Projects */}
+      <div className="mt-4">
+        I'm passionate about product innovation at the intersection of finance and technology—
+        from defining requirements for AI-based text-to-SQL models to owning the delivery of 
+        enterprise ETL pipelines that reduced processing time by 20%. I thrive on stakeholder 
+        management, backlog prioritization, and translating complex technical architectures 
+        into business value. Beyond work, I'm an Advanced Open Water Diver, active volunteer 
+        with NCSF Uplift, and enthusiast in dance and photography.
+      </div>
 
         {/* Contact Information */}
         <div className="mt-4">
