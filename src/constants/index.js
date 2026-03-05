@@ -36,8 +36,8 @@ import {
   Agender,
   csharp,
   WebScrapper,
-
 } from "../assets";
+
 export const navLinks = [
   {
     id: "about",
@@ -198,28 +198,9 @@ const experiences = [
     iconBg: "#E6DEDD",
     date: "2021 - 2022",
     points: [
-<<<<<<< HEAD
       "Valuations: Engineered complex financial models (DCF, LBO, Market Multiples) for M&A transactions, contributing to $500M+ in deal value",
       "Business Restructuring Services: Orchestrated assessments of underperforming business units, implementing optimization strategies that drove productivity gains and cost savings",
       "Operations: Led IT transformation initiatives that drove 15% operational efficiency boost for Philippines-based logistics company",
-=======
-      "Championed an AI-based text-to-SQL model, accelerating financial data analysis and democratizing data access",
-      "Engineered full-stack market sentiment platform using Python/Flask API backend and Angular dashboard, integrating data mining algorithms for real-time trading insights",
-      "Designed and implemented enterprise-scale ETL pipelines and data warehouse architecture for real-time financial market data, reducing processing time by 20% and enabling seamless market intelligence workflows",
-      "Automated end-to-end dashboard testing using Selenium WebDriver with Java/Spring Boot framework, achieving 99.9% test coverage across critical UI functionalities and user workflows",
-    ],
-  },
-  {
-    title: "Manager, Valuation Control (Developer)",
-    company_name: "Standard Chartered Bank",
-    icon: code1,
-    iconBg: "#E6DEDD",
-    date: "2025",
-    points: [
-      "Spearhead the design and implementation of quantitative validation tools for complex financial instruments, collaborating with trading desks to enhance valuation methodologies and control processes",
-      "Develop and maintain sophisticated Python-based valuation models and automated frameworks for independent price verification (IPV) and fair value adjustments, ensuring robust risk control and regulatory compliance",
-      "Architected and implemented CI/CD pipeline in Azure DevOps for automated deployment of Django applications, enhancing deployment efficiency and reliability",
->>>>>>> 735997f4e99ff1252cf33d402af8db7af41bc537
     ],
   },
 ];
